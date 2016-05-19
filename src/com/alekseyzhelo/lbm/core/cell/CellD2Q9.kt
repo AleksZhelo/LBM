@@ -18,7 +18,7 @@ class CellD2Q9 {
     var fBuf = DoubleArray(Q)
         private set
 
-    val U = DoubleArray(DescriptorD2Q9.D)
+    val U = DoubleArray(DescriptorD2Q9.D) // TODO: this takes too much memory?
 
     operator fun get(index: Int): Double {
         return f[index]
@@ -34,11 +34,19 @@ class CellD2Q9 {
      */
 
     // TODO: default parameters effect on performance?
+    /**
+     * Added 1.0 to correctly handle zero density in other calculations.
+     */
     fun computeRho(F: DoubleArray = fBuf): Double {
         return F[0] + F[1] + F[2] + F[3] + F[4] + F[5] + F[6] + F[7] + F[8]
     }
 
     fun computeU(Rho: Double, F: DoubleArray = fBuf): DoubleArray {
+        if(Rho == 0.0){ // TODO clutch, find a way to remove
+            U[0] = 0.0
+            U[1] = 0.0
+            return U
+        }
         U[0] = (F[1] + F[5] + F[8] - F[3] - F[6] - F[7]) / Rho
         U[1] = (F[2] + F[5] + F[6] - F[4] - F[7] - F[8]) / Rho
         return U
@@ -52,5 +60,13 @@ class CellD2Q9 {
             appendln("Velocity: (${U[0]}, ${U[1]})")
         }
     }
+
+    // TEST
+    fun swapBuffers(): Unit {
+        val tmp = f
+        f = fBuf
+        fBuf = tmp
+    }
+
 
 }

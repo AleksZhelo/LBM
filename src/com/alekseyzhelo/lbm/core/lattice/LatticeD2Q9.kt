@@ -16,10 +16,10 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9) {
     val cells = Array(LX, { x -> Array(LY, { x -> CellD2Q9() }) })
 
     fun streamPeriodic(): Unit {
-        for (i in cells.indices) {
+        for (i in cells.indices) { // over Y
             val iSub = if (i > 0) (i - 1) else (LX - 1)
             val iPlus = if (i < LX - 1) (i + 1) else (0)
-            for (j in cells[i].indices) { // TODO performance?
+            for (j in cells[i].indices) { //over Y // TODO performance?
                 val jSub = if (j > 0) (j - 1) else (LY - 1)
                 val jPlus = if (j < LY - 1) (j + 1) else (0)
                 // TODO if (!is_interior_solid_node[i][j]) {
@@ -44,6 +44,49 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9) {
             }
         }
     }
+
+    // TEST
+
+    fun testInit(i: Int, j: Int, q: Int, qValue: Double) {
+        cells[i][j][q] = qValue
+    }
+
+    fun swapCellBuffers(): Unit {
+        for (i in cells.indices) {
+            for (j in cells[i].indices) {
+                cells[i][j].swapBuffers()
+            }
+        }
+    }
+
+    fun toDensityTable(mainF: Boolean): String {
+        val func = if (mainF)
+            { x: CellD2Q9 -> x.computeRho(x.f) }
+        else
+            { x: CellD2Q9 -> x.computeRho(x.fBuf) }
+
+        return buildString {
+            for (j in cells[0].size - 1 downTo 0) {
+                for (i in cells.indices) {
+                    append("${func(cells[i][j])} ")
+                }
+                appendln()
+            }
+        }.replace("0.0", "_._")
+    }
+
+    fun totalDensity(): Double {
+        var total = 0.0
+        for (i in cells.indices) {
+            for (j in cells[i].indices) {
+                total += cells[i][j].computeRho(cells[i][j].f)
+            }
+        }
+
+        return total
+    }
+
+    // TEST END
 
     override fun toString(): String {
         return buildString {

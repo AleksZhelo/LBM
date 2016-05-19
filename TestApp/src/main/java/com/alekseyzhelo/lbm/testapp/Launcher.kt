@@ -24,13 +24,33 @@ fun main(args: Array<String>) {
         return
     }
 
+    val printLine = { x: Any -> if (cli.verbose) println(x) }
+
     val lattice = LatticeD2Q9(cli.lx, cli.ly, BGKDynamicsD2Q9(cli.omega))
     print(lattice)
+
+    lattice.testInit(10, 0, 0, 0.5)
+    lattice.testInit(0, 0, 1, 1.0)
+    lattice.testInit(0, 4, 2, 2.0)
+    lattice.testInit(0, 1, 3, 3.0)
+    lattice.testInit(1, 8, 4, 4.0)
+    lattice.testInit(1, 2, 5, 5.0)
+    lattice.testInit(3, 5, 6, 6.0)
+    lattice.testInit(6, 6, 7, 7.0)
+    lattice.testInit(6, 1, 8, 8.0)
+
+    printLine(lattice.toDensityTable(true))
+    printLine("Total density: ${lattice.totalDensity()}")
 
     var time = 0
     while (time++ < cli.time) {
         lattice.streamPeriodic()
-        lattice.collide()
+        if (cli.noCollisions)
+            lattice.swapCellBuffers()
+        else
+            lattice.collide()
+        printLine(lattice.toDensityTable(true))
+        printLine("Total density: ${lattice.totalDensity()}")
     }
     time--
 

@@ -22,6 +22,11 @@ public class CLISettings {
     @Parameter(names = {"--omega", "-o"}, description = "Reciprocal value of the relaxation parameter (1/tau).", required = true)
     private Double omega = null;
 
+    @Parameter(names = {"--verbose", "-v"}, description = "Print step-by-step details.")
+    private Boolean verbose = false;
+
+    @Parameter(names = {"--no-collision", "-nc"}, description = "Do not calculate collisions.")
+    private Boolean noCollisions = false;
 
     public Integer getTime() {
         return time;
@@ -37,5 +42,13 @@ public class CLISettings {
 
     public Integer getLy() {
         return ly;
+    }
+
+    public Boolean getVerbose() {
+        return verbose;
+    }
+
+    public Boolean getNoCollisions() {
+        return noCollisions;
     }
 }
