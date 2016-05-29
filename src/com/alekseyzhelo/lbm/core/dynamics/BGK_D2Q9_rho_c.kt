@@ -1,6 +1,7 @@
 package com.alekseyzhelo.lbm.core.dynamics
 
 import com.alekseyzhelo.lbm.core.cell.CellD2Q9
+import com.alekseyzhelo.lbm.core.lattice.DescriptorD2Q9
 
 /**
  * @author Aleks on 18-05-2016.
@@ -9,7 +10,14 @@ import com.alekseyzhelo.lbm.core.cell.CellD2Q9
 /**
  * To use with rho + 1 and no ifs in U calculation
  */
-class BGKDynamicsD2Q9_rho_c(val omega: Double) : Dynamics2DQ9 {
+// TODO: remove abstract when tested (or remove this class completely)
+abstract class BGKDynamicsD2Q9_rho_c(val omega: Double) : Dynamics2DQ9 {
+
+    // TODO correct?
+    override fun computeEquilibrium(i: Int, Rho: Double, U: DoubleArray, uSqr: Double): Double {
+        val c_u = DescriptorD2Q9.c[i][0] * U[0] + DescriptorD2Q9.c[i][1] * U[1]
+        return Rho * DescriptorD2Q9.w[i] * (1 + 3.0 * c_u + 4.5 * c_u * c_u - 1.5 * uSqr)
+    }
 
     // TODO field vs local var vs .. performance effect?
     val eqMult1 = 3.0

@@ -45,11 +45,31 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9) {
         }
     }
 
-    // TEST
-
-    fun testInit(i: Int, j: Int, q: Int, qValue: Double) {
-        cells[i][j][q] = qValue
+    fun iniEquilibrium(Rho: Double, U: DoubleArray): Unit { // constant U for the whole lattice
+        for (i in cells.indices) {
+            for (j in cells[i].indices) { // TODO performance?
+                dynamics.iniEquilibrium(cells[i][j], Rho, U)
+            }
+        }
     }
+
+    fun iniEquilibrium(Rho: Double, U: (i: Int, j: Int) -> DoubleArray): Unit { // U as a function of the cell's location
+        for (i in cells.indices) {
+            for (j in cells[i].indices) { // TODO performance?
+                dynamics.iniEquilibrium(cells[i][j], Rho, U(i, j))
+            }
+        }
+    }
+
+    fun iniEquilibrium(Rho: (i: Int, j: Int) -> Double, U: DoubleArray): Unit { // Rho as a function of the cell's location
+        for (i in cells.indices) {
+            for (j in cells[i].indices) { // TODO performance?
+                dynamics.iniEquilibrium(cells[i][j], Rho(i, j), U)
+            }
+        }
+    }
+
+    // TEST
 
     fun swapCellBuffers(): Unit {
         for (i in cells.indices) {
@@ -57,22 +77,6 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9) {
                 cells[i][j].swapBuffers()
             }
         }
-    }
-
-    fun toDensityTable(mainF: Boolean): String {
-        val func = if (mainF)
-            { x: CellD2Q9 -> x.computeRho(x.f) }
-        else
-            { x: CellD2Q9 -> x.computeRho(x.fBuf) }
-
-        return buildString {
-            for (j in cells[0].size - 1 downTo 0) {
-                for (i in cells.indices) {
-                    append("${func(cells[i][j])} ")
-                }
-                appendln()
-            }
-        }.replace("0.0", "_._")
     }
 
     fun totalDensity(): Double {

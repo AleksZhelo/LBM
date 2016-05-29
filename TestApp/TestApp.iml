@@ -14,5 +14,14 @@
     <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
     <orderEntry type="module" module-name="LBM" />
     <orderEntry type="library" name="Maven: com.beust:jcommander:1.48" level="project" />
+    <orderEntry type="module-library">
+      <library name="jcurses">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/jcurses.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

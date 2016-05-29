@@ -1,6 +1,8 @@
 package com.alekseyzhelo.lbm.core.dynamics
 
 import com.alekseyzhelo.lbm.core.cell.CellD2Q9
+import com.alekseyzhelo.lbm.core.lattice.DescriptorD2Q9.c
+import com.alekseyzhelo.lbm.core.lattice.DescriptorD2Q9.w
 
 /**
  * @author Aleks on 18-05-2016.
@@ -13,6 +15,11 @@ class BGKDynamicsD2Q9(val omega: Double) : Dynamics2DQ9 {
     val eqMult1 = 3.0
     val eqMult2 = 9.0 / 2.0
     val eqMult3 = 3.0 / 2.0
+
+    override fun computeEquilibrium(i: Int, Rho: Double, U: DoubleArray, uSqr: Double): Double {
+        val c_u = c[i][0] * U[0] + c[i][1] * U[1]
+        return Rho * w[i] * (1 + 3.0 * c_u + 4.5 * c_u * c_u - 1.5 * uSqr)
+    }
 
     // TODO experiment with optimizations here
     override fun collide(cell: CellD2Q9): Unit {
