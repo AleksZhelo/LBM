@@ -35,6 +35,6 @@ fun scalarProduct(U: DoubleArray, V: DoubleArray): Double {
     return prod;
 }
 
-private val doubleFormat = DecimalFormat("+0.00;-0.00")
+private val doubleFormat = DecimalFormat("+0.000;-0.000")
 fun Double.format() = doubleFormat.format(this)
 fun Double.format(digits: Int) = java.lang.String.format("%.${digits}f", this)

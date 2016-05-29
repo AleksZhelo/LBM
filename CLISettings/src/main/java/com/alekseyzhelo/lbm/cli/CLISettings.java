@@ -1,4 +1,4 @@
-package com.alekseyzhelo.lbm.testapp.cli;
+package com.alekseyzhelo.lbm.cli;
 
 import com.beust.jcommander.Parameter;
 
@@ -22,6 +22,12 @@ public class CLISettings {
     @Parameter(names = {"--omega", "-o"}, description = "Reciprocal value of the relaxation parameter (1/tau).", required = true)
     private Double omega = null;
 
+    @Parameter(names = {"--draw-velocities", "-vel"}, description = "Will draw velocities (instead of pressures).")
+    private Boolean drawVelocities = false;
+
+    @Parameter(names = {"--stopping", "-s"}, description = "Wait for any key input after every iteration.")
+    private Boolean stopping = false;
+
     @Parameter(names = {"--verbose", "-v"}, description = "Print step-by-step details.")
     private Boolean verbose = false;
 
@@ -42,6 +48,14 @@ public class CLISettings {
 
     public Integer getLy() {
         return ly;
+    }
+
+    public Boolean getDrawVelocities() {
+        return drawVelocities;
+    }
+
+    public Boolean getStopping() {
+        return stopping;
     }
 
     public Boolean getVerbose() {
