@@ -6,9 +6,7 @@ import com.alekseyzhelo.lbm.core.dynamics.BGKDynamicsD2Q9
 import com.alekseyzhelo.lbm.core.lattice.LatticeD2Q9
 import com.alekseyzhelo.lbm.functions.pressureWaveRho
 import com.alekseyzhelo.lbm.testapp.curses.*
-import com.alekseyzhelo.lbm.util.printCellPressure
-import com.alekseyzhelo.lbm.util.printCellVelocity
-import com.alekseyzhelo.lbm.util.printCellVelocityNorm
+import com.alekseyzhelo.lbm.util.*
 import jcurses.system.Toolkit
 
 /**
@@ -18,11 +16,11 @@ import jcurses.system.Toolkit
 fun main(args: Array<String>) {
     val cli = collectArguments("TestApp.jar", args)
     val lattice = setupLattice(cli)
-    lattice.iniEquilibrium(pressureWaveRho(cli.lx, cli.ly), doubleArrayOf(0.0, 0.0))
+    lattice.iniEquilibrium(pressureWaveRho(cli.lx, cli.ly, 1.4), doubleArrayOf(0.0, 0.0))
     //lattice.iniEquilibrium(1.0, diagonalVelocity)
     val maxVelocityNorm = lattice.maxVelocityNorm()
-    val minPressure = lattice.minPressure()
-    val maxPressure = lattice.maxPressure()
+    val minPressure = lattice.minDensity()
+    val maxPressure = lattice.maxDensity()
     val velocityRatedValue = { U: DoubleArray -> printCellVelocity(U) }
     val pressureRatedValue = { Rho: Double -> printCellPressure(Rho) }
 

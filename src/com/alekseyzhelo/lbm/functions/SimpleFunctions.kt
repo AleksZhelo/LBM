@@ -5,28 +5,29 @@ package com.alekseyzhelo.lbm.functions
  */
 
 // TODO: or functors?
-val pressureWaveRho: (lx: Int, ly: Int) -> (i: Int, j: Int) -> Double
+val pressureWaveRho: (lx: Int, ly: Int, waveCenterRho: Double) -> (i: Int, j: Int) -> Double
         =
-        { lx, ly ->
-            val balancedRho = 1.0 - 0.4 / (lx * ly)
+        { lx, ly, waveCenterRho ->
+            val balancedRho = 1.0 - (waveCenterRho - 1.0) / (lx * ly)
             { i: Int, j: Int ->
                 if (i == lx / 2 && j == ly / 2) {
-                    1.4
+                    waveCenterRho
                 } else {
                     balancedRho
                 }
             }
         }
 
-val triplePressureWaveRho: (lx: Int, ly: Int) -> (i: Int, j: Int) -> Double
+val multiplePressureWaveRho: (lx: Int, ly: Int, waveX: Int, waveY: Int, waveCenterRho: Double) -> (i: Int, j: Int) -> Double
         =
-        { lx, ly ->
-            val balancedRho = 1.0 - 3 * 0.4 / lx * ly
+        { lx, ly, waveX, waveY, waveCenterRho ->
+            val balancedRho = 1.0 - (waveX * waveY * (waveCenterRho - 1.0)) / (lx * ly)
+            val centerX = lx / 2
+            val centerY = ly / 2
             { i: Int, j: Int ->
                 when {
-                    i == 5 && j == 5 -> 1.4
-                    i == 3 && j == 7 -> 1.4
-                    i == 7 && j == 3 -> 1.4
+                    (i >= centerX - waveX / 2) && (i <= centerX + waveX / 2)
+                            && (j >= centerY - waveY / 2) && (j <= centerY + waveY / 2) -> waveCenterRho
                     else -> balancedRho
                 }
             }

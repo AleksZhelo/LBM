@@ -69,6 +69,14 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9) {
         }
     }
 
+    fun iniEquilibrium(Rho: (i: Int, j: Int) -> Double, U: (i: Int, j: Int) -> DoubleArray): Unit { // Rho and U as functions of the cell's location
+        for (i in cells.indices) {
+            for (j in cells[i].indices) { // TODO performance?
+                dynamics.iniEquilibrium(cells[i][j], Rho(i, j), U(i, j))
+            }
+        }
+    }
+
     // TEST
 
     fun swapCellBuffers(): Unit {
