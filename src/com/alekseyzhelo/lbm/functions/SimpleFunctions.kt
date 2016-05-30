@@ -33,6 +33,18 @@ val multiplePressureWaveRho: (lx: Int, ly: Int, waveX: Int, waveY: Int, waveCent
             }
         }
 
+val columnPressureWaveRho: (lx: Int, ly: Int, waveXpos: Int, waveCenterRho: Double) -> (i: Int, j: Int) -> Double
+        =
+        { lx, ly, waveXpos, waveCenterRho ->
+            val balancedRho = 1.0 - (ly * (waveCenterRho - 1.0)) / (lx * ly)
+            { i: Int, j: Int ->
+                when {
+                    (i == waveXpos)-> waveCenterRho
+                    else -> balancedRho
+                }
+            }
+        }
+
 val diagonalVelocity = { i: Int, j: Int ->
     if ((i <= 7 && i >= 4) && (j <= 7 && j >= 4)) {
         doubleArrayOf(0.5, -0.5)

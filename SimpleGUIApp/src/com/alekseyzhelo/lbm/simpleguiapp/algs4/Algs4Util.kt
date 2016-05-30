@@ -1,9 +1,8 @@
 package com.alekseyzhelo.lbm.simpleguiapp.algs4
 
-import com.alekseyzhelo.lbm.core.cell.CellD2Q9
 import com.alekseyzhelo.lbm.core.lattice.LatticeD2Q9
+import com.alekseyzhelo.lbm.util.norm
 import com.alekseyzhelo.lbm.util.normalize
-import edu.princeton.cs.algs4.StdDraw
 import java.awt.Color
 import java.util.*
 
@@ -20,18 +19,19 @@ internal fun blueRedGradient(n: Int): Color {
         n < 0 -> 0
         else -> n
     }
-    val b = 255 - corrected
-    val r = 255 - b
-    val g = 0
 
-    var rgb = r;
-    rgb = (rgb shl 8) + g;
-    rgb = (rgb shl 8) + b;
-
-    var color = colorMemo[rgb]
+    var color = colorMemo[corrected]
     if (color == null) {
+        val b = 255 - corrected
+        val r = 255 - b
+        val g = 0
+
+//    var rgb = r;
+//    rgb = (rgb shl 8) + g;
+//    rgb = (rgb shl 8) + b;
+
         color = Color (r, g, b)
-        colorMemo.put(rgb, color)
+        colorMemo.put(corrected, color)
     }
     return color
 }
@@ -41,12 +41,12 @@ internal fun cellColor(normalized: Double): Color {
 }
 
 // TODO: fix for non-square lattice
-fun CellD2Q9.drawDensity(i: Int, j: Int, N: Int,
-                         minDensity: Double, maxDensity: Double): Unit {
-    val Rho = computeRho(f)
-    val color = cellColor(normalize(Rho, minDensity, maxDensity))
-    StdDraw.setPenColor(color);
-    StdDraw.filledSquare(j - 0.5, N - i + 0.5, 0.45);
+internal fun drawScalarValue(value: Double, i: Int, j: Int, N: Int,
+                             minValue: Double, maxValue: Double): Unit {
+    val color = cellColor(normalize(value, minValue, maxValue))
+    FasterStdDraw.setPenColor(color);
+    //FasterStdDraw.deferredFilledSquare(j - 0.5, N - i + 0.5, 0.45);
+    FasterStdDraw.deferredFilledSquare(j - 0.5, N - i + 0.5, 1.0); // double r
 }
 
 // TODO: fix for non-square lattice
@@ -55,7 +55,21 @@ fun LatticeD2Q9.drawDensityTable(minDensity: Double, maxDensity: Double): Unit {
 
     for (j in cells[0].size - 1 downTo 0) {
         for (i in cells.indices) {
-            cells[i][j].drawDensity(i + 1, j + 1, N, minDensity, maxDensity)
+            drawScalarValue(cells[i][j].computeRho(cells[i][j].f), i + 1, j + 1, N, minDensity, maxDensity)
+        }
+    }
+}
+
+// TODO: fix for non-square lattice
+fun LatticeD2Q9.drawVelocityNormTable(minVelocityNorm: Double, maxVelocityNorm: Double): Unit {
+    val N = (cells[0].size + cells.size) / 2 // (rows + cols) / 2
+
+    for (j in cells[0].size - 1 downTo 0) {
+        for (i in cells.indices) {
+            drawScalarValue(
+                    norm(cells[i][j].computeRhoU(cells[i][j].f)),
+                    i + 1, j + 1, N, minVelocityNorm, maxVelocityNorm
+            )
         }
     }
 }

@@ -79,6 +79,15 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9) {
 
     // TEST
 
+    fun iniTest(dist: (i: Int, j: Int, k: Int) -> Double): Unit {
+        for (i in cells.indices) {
+            for (j in cells[i].indices) { // TODO performance?
+                for (k in 0..DescriptorD2Q9.Q - 1)
+                    cells[i][j][k] = dist(i, j, k)
+            }
+        }
+    }
+
     fun swapCellBuffers(): Unit {
         for (i in cells.indices) {
             for (j in cells[i].indices) {
