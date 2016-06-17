@@ -57,7 +57,7 @@ fun main(args: Array<String>) {
         if (noCollisions)
             lattice.swapCellBuffers()
         else
-            lattice.collide()
+            lattice.collideParallel()
         visualize()
         //printLine("Total density: ${lattice.totalDensity()}")
     }
