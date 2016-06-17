@@ -2,6 +2,7 @@ package com.alekseyzhelo.lbm.core.lattice
 
 import com.alekseyzhelo.lbm.core.cell.CellD2Q9
 import com.alekseyzhelo.lbm.core.dynamics.Dynamics2DQ9
+import java.util.stream.IntStream
 
 /**
  * @author Aleks on 17-05-2016.
@@ -11,12 +12,12 @@ import com.alekseyzhelo.lbm.core.dynamics.Dynamics2DQ9
 // TODO: units
 // TODO?: boundary conditions
 // TODO?: solids, etc
-class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9) {
+open class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9) {
 
     val cells = Array(LX, { x -> Array(LY, { x -> CellD2Q9() }) })
 
     fun streamPeriodic(): Unit {
-        for (i in cells.indices) { // over Y
+        for (i in cells.indices) { // over X
             val iSub = if (i > 0) (i - 1) else (LX - 1)
             val iPlus = if (i < LX - 1) (i + 1) else (0)
             for (j in cells[i].indices) { //over Y // TODO performance?
@@ -43,6 +44,15 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9) {
                 dynamics.collide(cells[i][j])
             }
         }
+    }
+
+    fun collideParallel(): Unit {
+        IntStream.range(0, LX)
+                .parallel()
+                .forEach { i ->
+                    IntStream.range(0, LY)
+                            .forEach { j -> dynamics.collide(cells[i][j]) }
+                }
     }
 
     fun iniEquilibrium(Rho: Double, U: DoubleArray): Unit { // constant U for the whole lattice
@@ -77,16 +87,7 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9) {
         }
     }
 
-    // TEST
-
-    fun iniTest(dist: (i: Int, j: Int, k: Int) -> Double): Unit {
-        for (i in cells.indices) {
-            for (j in cells[i].indices) { // TODO performance?
-                for (k in 0..DescriptorD2Q9.Q - 1)
-                    cells[i][j][k] = dist(i, j, k)
-            }
-        }
-    }
+// TEST
 
     fun swapCellBuffers(): Unit {
         for (i in cells.indices) {
@@ -107,7 +108,7 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9) {
         return total
     }
 
-    // TEST END
+// TEST END
 
     override fun toString(): String {
         return buildString {

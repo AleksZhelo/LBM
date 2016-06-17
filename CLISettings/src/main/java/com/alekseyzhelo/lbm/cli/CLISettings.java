@@ -25,14 +25,20 @@ public class CLISettings {
     @Parameter(names = {"--draw-velocities", "-vel"}, description = "Will draw velocities (instead of pressures).")
     private Boolean drawVelocities = false;
 
-    @Parameter(names = {"--stopping", "-s"}, description = "Wait for any key input after every iteration.")
-    private Boolean stopping = false;
+    @Parameter(names = {"--stop", "-s"}, description = "Wait for any key input before starting the simulation.")
+    private Boolean stop = false;
 
     @Parameter(names = {"--verbose", "-v"}, description = "Print step-by-step details.")
     private Boolean verbose = false;
 
     @Parameter(names = {"--no-collision", "-nc"}, description = "Do not calculate collisions.")
     private Boolean noCollisions = false;
+
+    @Parameter(names = {"--no-rescale", "-nr"}, description = "Do not rescale the visualization parameter on every step.")
+    private Boolean noRescale = false;
+
+    @Parameter(names = {"--headless", "-h"}, description = "Do not do any visualization.")
+    private Boolean headless = false;
 
     public Integer getTime() {
         return time;
@@ -54,8 +60,8 @@ public class CLISettings {
         return drawVelocities;
     }
 
-    public Boolean getStopping() {
-        return stopping;
+    public Boolean getStop() {
+        return stop;
     }
 
     public Boolean getVerbose() {
@@ -64,5 +70,13 @@ public class CLISettings {
 
     public Boolean getNoCollisions() {
         return noCollisions;
+    }
+
+    public Boolean getNoRescale() {
+        return noRescale;
+    }
+
+    public Boolean getHeadless() {
+        return headless;
     }
 }

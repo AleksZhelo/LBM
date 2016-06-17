@@ -29,13 +29,14 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.*;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DirectColorModel;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.LinkedList;
 import java.util.TreeSet;
 
@@ -253,8 +254,8 @@ public final class FasterStdDraw implements ActionListener, MouseListener, Mouse
     private static void init() {
         if (frame != null) frame.setVisible(false);
         frame = new JFrame();
-        offscreenImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        onscreenImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        offscreenImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        onscreenImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         offscreen = offscreenImage.createGraphics();
         onscreen = onscreenImage.createGraphics();
         setXscale();
@@ -266,10 +267,9 @@ public final class FasterStdDraw implements ActionListener, MouseListener, Mouse
         setFont();
         clear();
 
-        // add antialiasing
-        RenderingHints hints = new RenderingHints(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
-        hints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        RenderingHints hints = new RenderingHints(RenderingHints.KEY_RENDERING,
+                RenderingHints.VALUE_RENDER_SPEED);
+        hints.put(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_SPEED);
         offscreen.addRenderingHints(hints);
 
         // frame stuff
@@ -572,130 +572,6 @@ public final class FasterStdDraw implements ActionListener, MouseListener, Mouse
     }
 
     /**
-     * Draw a circle of radius r, centered on (x, y).
-     *
-     * @param x the x-coordinate of the center of the circle
-     * @param y the y-coordinate of the center of the circle
-     * @param r the radius of the circle
-     * @throws IllegalArgumentException if the radius of the circle is negative
-     */
-    public static void circle(double x, double y, double r) {
-        if (r < 0) throw new IllegalArgumentException("circle radius must be nonnegative");
-        double xs = scaleX(x);
-        double ys = scaleY(y);
-        double ws = factorX(2 * r);
-        double hs = factorY(2 * r);
-        if (ws <= 1 && hs <= 1) pixel(x, y);
-        else offscreen.draw(new Ellipse2D.Double(xs - ws / 2, ys - hs / 2, ws, hs));
-        draw();
-    }
-
-    /**
-     * Draw filled circle of radius r, centered on (x, y).
-     *
-     * @param x the x-coordinate of the center of the circle
-     * @param y the y-coordinate of the center of the circle
-     * @param r the radius of the circle
-     * @throws IllegalArgumentException if the radius of the circle is negative
-     */
-    public static void filledCircle(double x, double y, double r) {
-        if (r < 0) throw new IllegalArgumentException("circle radius must be nonnegative");
-        double xs = scaleX(x);
-        double ys = scaleY(y);
-        double ws = factorX(2 * r);
-        double hs = factorY(2 * r);
-        if (ws <= 1 && hs <= 1) pixel(x, y);
-        else offscreen.fill(new Ellipse2D.Double(xs - ws / 2, ys - hs / 2, ws, hs));
-        draw();
-    }
-
-
-    /**
-     * Draw an ellipse with given semimajor and semiminor axes, centered on (x, y).
-     *
-     * @param x             the x-coordinate of the center of the ellipse
-     * @param y             the y-coordinate of the center of the ellipse
-     * @param semiMajorAxis is the semimajor axis of the ellipse
-     * @param semiMinorAxis is the semiminor axis of the ellipse
-     * @throws IllegalArgumentException if either of the axes are negative
-     */
-    public static void ellipse(double x, double y, double semiMajorAxis, double semiMinorAxis) {
-        if (semiMajorAxis < 0) throw new IllegalArgumentException("ellipse semimajor axis must be nonnegative");
-        if (semiMinorAxis < 0) throw new IllegalArgumentException("ellipse semiminor axis must be nonnegative");
-        double xs = scaleX(x);
-        double ys = scaleY(y);
-        double ws = factorX(2 * semiMajorAxis);
-        double hs = factorY(2 * semiMinorAxis);
-        if (ws <= 1 && hs <= 1) pixel(x, y);
-        else offscreen.draw(new Ellipse2D.Double(xs - ws / 2, ys - hs / 2, ws, hs));
-        draw();
-    }
-
-    /**
-     * Draw an ellipse with given semimajor and semiminor axes, centered on (x, y).
-     *
-     * @param x             the x-coordinate of the center of the ellipse
-     * @param y             the y-coordinate of the center of the ellipse
-     * @param semiMajorAxis is the semimajor axis of the ellipse
-     * @param semiMinorAxis is the semiminor axis of the ellipse
-     * @throws IllegalArgumentException if either of the axes are negative
-     */
-    public static void filledEllipse(double x, double y, double semiMajorAxis, double semiMinorAxis) {
-        if (semiMajorAxis < 0) throw new IllegalArgumentException("ellipse semimajor axis must be nonnegative");
-        if (semiMinorAxis < 0) throw new IllegalArgumentException("ellipse semiminor axis must be nonnegative");
-        double xs = scaleX(x);
-        double ys = scaleY(y);
-        double ws = factorX(2 * semiMajorAxis);
-        double hs = factorY(2 * semiMinorAxis);
-        if (ws <= 1 && hs <= 1) pixel(x, y);
-        else offscreen.fill(new Ellipse2D.Double(xs - ws / 2, ys - hs / 2, ws, hs));
-        draw();
-    }
-
-
-    /**
-     * Draw an arc of radius r, centered on (x, y), from angle1 to angle2 (in degrees).
-     *
-     * @param x      the x-coordinate of the center of the circle
-     * @param y      the y-coordinate of the center of the circle
-     * @param r      the radius of the circle
-     * @param angle1 the starting angle. 0 would mean an arc beginning at 3 o'clock.
-     * @param angle2 the angle at the end of the arc. For example, if
-     *               you want a 90 degree arc, then angle2 should be angle1 + 90.
-     * @throws IllegalArgumentException if the radius of the circle is negative
-     */
-    public static void arc(double x, double y, double r, double angle1, double angle2) {
-        if (r < 0) throw new IllegalArgumentException("arc radius must be nonnegative");
-        while (angle2 < angle1) angle2 += 360;
-        double xs = scaleX(x);
-        double ys = scaleY(y);
-        double ws = factorX(2 * r);
-        double hs = factorY(2 * r);
-        if (ws <= 1 && hs <= 1) pixel(x, y);
-        else offscreen.draw(new Arc2D.Double(xs - ws / 2, ys - hs / 2, ws, hs, angle1, angle2 - angle1, Arc2D.OPEN));
-        draw();
-    }
-
-    /**
-     * Draw a square of side length 2r, centered on (x, y).
-     *
-     * @param x the x-coordinate of the center of the square
-     * @param y the y-coordinate of the center of the square
-     * @param r radius is half the length of any side of the square
-     * @throws IllegalArgumentException if r is negative
-     */
-    public static void square(double x, double y, double r) {
-        if (r < 0) throw new IllegalArgumentException("square side length must be nonnegative");
-        double xs = scaleX(x);
-        double ys = scaleY(y);
-        double ws = factorX(2 * r);
-        double hs = factorY(2 * r);
-        if (ws <= 1 && hs <= 1) pixel(x, y);
-        else offscreen.draw(new Rectangle2D.Double(xs - ws / 2, ys - hs / 2, ws, hs));
-        draw();
-    }
-
-    /**
      * Draw a filled square of side length 2r, centered on (x, y).
      *
      * @param x the x-coordinate of the center of the square
@@ -720,8 +596,8 @@ public final class FasterStdDraw implements ActionListener, MouseListener, Mouse
     /**
      * Draw a filled square of side length 2r, centered on (x, y).
      *
-     * @param x the x-coordinate of the center of the square
-     * @param y the y-coordinate of the center of the square
+     * @param x       the x-coordinate of the center of the square
+     * @param y       the y-coordinate of the center of the square
      * @param doubleR double radius is the length of any side of the square
      * @throws IllegalArgumentException if r is negative
      */
@@ -734,222 +610,15 @@ public final class FasterStdDraw implements ActionListener, MouseListener, Mouse
         offscreen.fill(drawRect);
     }
 
-
-    /**
-     * Draw a rectangle of given half width and half height, centered on (x, y).
-     *
-     * @param x          the x-coordinate of the center of the rectangle
-     * @param y          the y-coordinate of the center of the rectangle
-     * @param halfWidth  is half the width of the rectangle
-     * @param halfHeight is half the height of the rectangle
-     * @throws IllegalArgumentException if halfWidth or halfHeight is negative
-     */
-    public static void rectangle(double x, double y, double halfWidth, double halfHeight) {
-        if (halfWidth < 0) throw new IllegalArgumentException("half width must be nonnegative");
-        if (halfHeight < 0) throw new IllegalArgumentException("half height must be nonnegative");
-        double xs = scaleX(x);
-        double ys = scaleY(y);
-        double ws = factorX(2 * halfWidth);
-        double hs = factorY(2 * halfHeight);
-        if (ws <= 1 && hs <= 1) pixel(x, y);
-        else offscreen.draw(new Rectangle2D.Double(xs - ws / 2, ys - hs / 2, ws, hs));
-        draw();
+    public static void deferredFilledSquareTest(double x, double y, double doubleR) {
+        drawRect.setRect(
+                width * (x - xmin) / precalcXScale,
+                height * (ymax - y) / precalcYScale,
+                doubleR * precalcFactorX,
+                doubleR * precalcFactorY
+        );
+        offscreen.fill(drawRect);
     }
-
-    /**
-     * Draw a filled rectangle of given half width and half height, centered on (x, y).
-     *
-     * @param x          the x-coordinate of the center of the rectangle
-     * @param y          the y-coordinate of the center of the rectangle
-     * @param halfWidth  is half the width of the rectangle
-     * @param halfHeight is half the height of the rectangle
-     * @throws IllegalArgumentException if halfWidth or halfHeight is negative
-     */
-    public static void filledRectangle(double x, double y, double halfWidth, double halfHeight) {
-        if (halfWidth < 0) throw new IllegalArgumentException("half width must be nonnegative");
-        if (halfHeight < 0) throw new IllegalArgumentException("half height must be nonnegative");
-        double xs = scaleX(x);
-        double ys = scaleY(y);
-        double ws = factorX(2 * halfWidth);
-        double hs = factorY(2 * halfHeight);
-        if (ws <= 1 && hs <= 1) pixel(x, y);
-        else offscreen.fill(new Rectangle2D.Double(xs - ws / 2, ys - hs / 2, ws, hs));
-        draw();
-    }
-
-
-    /**
-     * Draw a polygon with the given (x[i], y[i]) coordinates.
-     *
-     * @param x an array of all the x-coordinates of the polygon
-     * @param y an array of all the y-coordinates of the polygon
-     */
-    public static void polygon(double[] x, double[] y) {
-        int N = x.length;
-        GeneralPath path = new GeneralPath();
-        path.moveTo((float) scaleX(x[0]), (float) scaleY(y[0]));
-        for (int i = 0; i < N; i++)
-            path.lineTo((float) scaleX(x[i]), (float) scaleY(y[i]));
-        path.closePath();
-        offscreen.draw(path);
-        draw();
-    }
-
-    /**
-     * Draw a filled polygon with the given (x[i], y[i]) coordinates.
-     *
-     * @param x an array of all the x-coordinates of the polygon
-     * @param y an array of all the y-coordinates of the polygon
-     */
-    public static void filledPolygon(double[] x, double[] y) {
-        int N = x.length;
-        GeneralPath path = new GeneralPath();
-        path.moveTo((float) scaleX(x[0]), (float) scaleY(y[0]));
-        for (int i = 0; i < N; i++)
-            path.lineTo((float) scaleX(x[i]), (float) scaleY(y[i]));
-        path.closePath();
-        offscreen.fill(path);
-        draw();
-    }
-
-
-    /***************************************************************************
-     * Drawing images.
-     ***************************************************************************/
-
-    // get an image from the given filename
-    private static Image getImage(String filename) {
-
-        // to read from file
-        ImageIcon icon = new ImageIcon(filename);
-
-        // try to read from URL
-        if ((icon == null) || (icon.getImageLoadStatus() != MediaTracker.COMPLETE)) {
-            try {
-                URL url = new URL(filename);
-                icon = new ImageIcon(url);
-            } catch (Exception e) {
-                /* not a url */
-            }
-        }
-
-        // in case file is inside a .jar
-        if ((icon == null) || (icon.getImageLoadStatus() != MediaTracker.COMPLETE)) {
-            URL url = FasterStdDraw.class.getResource(filename);
-            if (url == null) throw new IllegalArgumentException("image " + filename + " not found");
-            icon = new ImageIcon(url);
-        }
-
-        return icon.getImage();
-    }
-
-    /**
-     * Draw picture (gif, jpg, or png) centered on (x, y).
-     *
-     * @param x the center x-coordinate of the image
-     * @param y the center y-coordinate of the image
-     * @param s the name of the image/picture, e.g., "ball.gif"
-     * @throws IllegalArgumentException if the image is corrupt
-     */
-    public static void picture(double x, double y, String s) {
-        Image image = getImage(s);
-        double xs = scaleX(x);
-        double ys = scaleY(y);
-        int ws = image.getWidth(null);
-        int hs = image.getHeight(null);
-        if (ws < 0 || hs < 0) throw new IllegalArgumentException("image " + s + " is corrupt");
-
-        offscreen.drawImage(image, (int) Math.round(xs - ws / 2.0), (int) Math.round(ys - hs / 2.0), null);
-        draw();
-    }
-
-    /**
-     * Draw picture (gif, jpg, or png) centered on (x, y),
-     * rotated given number of degrees.
-     *
-     * @param x       the center x-coordinate of the image
-     * @param y       the center y-coordinate of the image
-     * @param s       the name of the image/picture, e.g., "ball.gif"
-     * @param degrees is the number of degrees to rotate counterclockwise
-     * @throws IllegalArgumentException if the image is corrupt
-     */
-    public static void picture(double x, double y, String s, double degrees) {
-        Image image = getImage(s);
-        double xs = scaleX(x);
-        double ys = scaleY(y);
-        int ws = image.getWidth(null);
-        int hs = image.getHeight(null);
-        if (ws < 0 || hs < 0) throw new IllegalArgumentException("image " + s + " is corrupt");
-
-        offscreen.rotate(Math.toRadians(-degrees), xs, ys);
-        offscreen.drawImage(image, (int) Math.round(xs - ws / 2.0), (int) Math.round(ys - hs / 2.0), null);
-        offscreen.rotate(Math.toRadians(+degrees), xs, ys);
-
-        draw();
-    }
-
-    /**
-     * Draw picture (gif, jpg, or png) centered on (x, y), rescaled to w-by-h.
-     *
-     * @param x the center x coordinate of the image
-     * @param y the center y coordinate of the image
-     * @param s the name of the image/picture, e.g., "ball.gif"
-     * @param w the width of the image
-     * @param h the height of the image
-     * @throws IllegalArgumentException if the width height are negative
-     * @throws IllegalArgumentException if the image is corrupt
-     */
-    public static void picture(double x, double y, String s, double w, double h) {
-        Image image = getImage(s);
-        double xs = scaleX(x);
-        double ys = scaleY(y);
-        if (w < 0) throw new IllegalArgumentException("width is negative: " + w);
-        if (h < 0) throw new IllegalArgumentException("height is negative: " + h);
-        double ws = factorX(w);
-        double hs = factorY(h);
-        if (ws < 0 || hs < 0) throw new IllegalArgumentException("image " + s + " is corrupt");
-        if (ws <= 1 && hs <= 1) pixel(x, y);
-        else {
-            offscreen.drawImage(image, (int) Math.round(xs - ws / 2.0),
-                    (int) Math.round(ys - hs / 2.0),
-                    (int) Math.round(ws),
-                    (int) Math.round(hs), null);
-        }
-        draw();
-    }
-
-
-    /**
-     * Draw picture (gif, jpg, or png) centered on (x, y), rotated
-     * given number of degrees, rescaled to w-by-h.
-     *
-     * @param x       the center x-coordinate of the image
-     * @param y       the center y-coordinate of the image
-     * @param s       the name of the image/picture, e.g., "ball.gif"
-     * @param w       the width of the image
-     * @param h       the height of the image
-     * @param degrees is the number of degrees to rotate counterclockwise
-     * @throws IllegalArgumentException if the image is corrupt
-     */
-    public static void picture(double x, double y, String s, double w, double h, double degrees) {
-        Image image = getImage(s);
-        double xs = scaleX(x);
-        double ys = scaleY(y);
-        double ws = factorX(w);
-        double hs = factorY(h);
-        if (ws < 0 || hs < 0) throw new IllegalArgumentException("image " + s + " is corrupt");
-        if (ws <= 1 && hs <= 1) pixel(x, y);
-
-        offscreen.rotate(Math.toRadians(-degrees), xs, ys);
-        offscreen.drawImage(image, (int) Math.round(xs - ws / 2.0),
-                (int) Math.round(ys - hs / 2.0),
-                (int) Math.round(ws),
-                (int) Math.round(hs), null);
-        offscreen.rotate(Math.toRadians(+degrees), xs, ys);
-
-        draw();
-    }
-
 
     /***************************************************************************
      *  Drawing text.
@@ -1321,33 +990,6 @@ public final class FasterStdDraw implements ActionListener, MouseListener, Mouse
         synchronized (keyLock) {
             keysDown.remove(e.getKeyCode());
         }
-    }
-
-
-    /**
-     * Test client.
-     */
-    public static void main(String[] args) {
-        FasterStdDraw.square(.2, .8, .1);
-        FasterStdDraw.filledSquare(.8, .8, .2);
-        FasterStdDraw.circle(.8, .2, .2);
-
-        FasterStdDraw.setPenColor(FasterStdDraw.BOOK_RED);
-        FasterStdDraw.setPenRadius(.02);
-        FasterStdDraw.arc(.8, .2, .1, 200, 45);
-
-        // draw a blue diamond
-        FasterStdDraw.setPenRadius();
-        FasterStdDraw.setPenColor(FasterStdDraw.BOOK_BLUE);
-        double[] x = {.1, .2, .3, .2};
-        double[] y = {.2, .3, .2, .1};
-        FasterStdDraw.filledPolygon(x, y);
-
-        // text
-        FasterStdDraw.setPenColor(FasterStdDraw.BLACK);
-        FasterStdDraw.text(0.2, 0.5, "black text");
-        FasterStdDraw.setPenColor(FasterStdDraw.WHITE);
-        FasterStdDraw.text(0.8, 0.8, "white text");
     }
 
 }

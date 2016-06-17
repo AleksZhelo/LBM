@@ -47,7 +47,7 @@ fun main(args: Array<String>) {
             true -> lattice.drawVelocityRatedTable(0.0, maxVelocityNorm, velocityRatedValue)
             false -> lattice.drawPressureRatedTable(minPressure, maxPressure, pressureRatedValue)
         }
-        if (cli.stopping) Toolkit.readCharacter()
+        if (cli.stop) Toolkit.readCharacter()
         //printLine("Total density: ${lattice.totalDensity()}")
     }
     time--

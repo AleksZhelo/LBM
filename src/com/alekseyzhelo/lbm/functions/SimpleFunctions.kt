@@ -5,6 +5,8 @@ package com.alekseyzhelo.lbm.functions
  */
 
 // TODO: or functors?
+// TODO: should I turn these into usual functions? What is the difference between declaring them like this
+// TODO: and the usual way?
 val pressureWaveRho: (lx: Int, ly: Int, waveCenterRho: Double) -> (i: Int, j: Int) -> Double
         =
         { lx, ly, waveCenterRho ->
@@ -39,7 +41,7 @@ val columnPressureWaveRho: (lx: Int, ly: Int, waveXpos: Int, waveCenterRho: Doub
             val balancedRho = 1.0 - (ly * (waveCenterRho - 1.0)) / (lx * ly)
             { i: Int, j: Int ->
                 when {
-                    (i == waveXpos)-> waveCenterRho
+                    (i == waveXpos) -> waveCenterRho
                     else -> balancedRho
                 }
             }
@@ -51,4 +53,20 @@ val diagonalVelocity = { i: Int, j: Int ->
     } else {
         doubleArrayOf(0.0, 0.0)
     }
+}
+
+/**
+ * @param L height of the lattice
+ * @param kNum wave number k
+ */
+val shearWaveVelocity = { L: Double, kNum: Int, a0: Double ->
+    val k = (1 + kNum) * 2.0 * Math.PI / L
+    { i: Int, j: Int ->
+        doubleArrayOf(a0 * Math.sin(k * j), 0.0)
+    }
+}
+
+val shearWaveMaxVelocityY = {L: Double, kNum: Int ->
+    val period = L / (1 + kNum).toDouble()
+    (period / 4).toInt()
 }

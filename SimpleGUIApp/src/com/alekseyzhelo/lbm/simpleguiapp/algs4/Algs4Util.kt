@@ -41,34 +41,29 @@ internal fun cellColor(normalized: Double): Color {
 }
 
 // TODO: fix for non-square lattice
-internal fun drawScalarValue(value: Double, i: Int, j: Int, N: Int,
+internal fun drawScalarValue(value: Double, i: Int, j: Int, LX: Int, LY: Int,
                              minValue: Double, maxValue: Double): Unit {
     val color = cellColor(normalize(value, minValue, maxValue))
     FasterStdDraw.setPenColor(color);
-    //FasterStdDraw.deferredFilledSquare(j - 0.5, N - i + 0.5, 0.45);
-    FasterStdDraw.deferredFilledSquare(j - 0.5, N - i + 0.5, 1.0); // double r
+    FasterStdDraw.deferredFilledSquareTest((i).toDouble(), (LY - j).toDouble(), 1.0); // double r
 }
 
 // TODO: fix for non-square lattice
 fun LatticeD2Q9.drawDensityTable(minDensity: Double, maxDensity: Double): Unit {
-    val N = (cells[0].size + cells.size) / 2 // (rows + cols) / 2
-
     for (j in cells[0].size - 1 downTo 0) {
         for (i in cells.indices) {
-            drawScalarValue(cells[i][j].computeRho(cells[i][j].f), i + 1, j + 1, N, minDensity, maxDensity)
+            drawScalarValue(cells[i][j].computeRho(cells[i][j].f), i, j, LX, LY, minDensity, maxDensity)
         }
     }
 }
 
 // TODO: fix for non-square lattice
 fun LatticeD2Q9.drawVelocityNormTable(minVelocityNorm: Double, maxVelocityNorm: Double): Unit {
-    val N = (cells[0].size + cells.size) / 2 // (rows + cols) / 2
-
     for (j in cells[0].size - 1 downTo 0) {
         for (i in cells.indices) {
             drawScalarValue(
                     norm(cells[i][j].computeRhoU(cells[i][j].f)),
-                    i + 1, j + 1, N, minVelocityNorm, maxVelocityNorm
+                    i, j, LX, LY, minVelocityNorm, maxVelocityNorm
             )
         }
     }

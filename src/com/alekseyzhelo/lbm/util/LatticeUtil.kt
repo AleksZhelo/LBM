@@ -29,6 +29,18 @@ fun LatticeD2Q9.maxDensity(): Double { // TODO can be called without a lattice? 
     return max
 }
 
+fun LatticeD2Q9.minVelocityNorm(): Double { // TODO can be called without a lattice? WTF?
+    var min = Double.MAX_VALUE
+    for (i in cells.indices) {
+        for (j in cells[i].indices) {
+            val norm = norm(cells[i][j].computeRhoU(cells[i][j].f))
+            if (norm < min) min = norm
+        }
+    }
+
+    return min
+}
+
 fun LatticeD2Q9.maxVelocityNorm(): Double { // TODO can be called without a lattice? WTF?
     var max = 0.0
     for (i in cells.indices) {
