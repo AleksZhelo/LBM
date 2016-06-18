@@ -1,8 +1,10 @@
 package com.alekseyzhelo.lbm.simpleguiapp.util
 
+import com.alekseyzhelo.lbm.boundary.BoundaryPosition
+import com.alekseyzhelo.lbm.boundary.BoundaryType
 import com.alekseyzhelo.lbm.cli.CLISettings
-import com.alekseyzhelo.lbm.core.dynamics.BGKDynamicsD2Q9
 import com.alekseyzhelo.lbm.core.lattice.LatticeD2Q9
+import com.alekseyzhelo.lbm.dynamics.BGKDynamicsD2Q9
 import com.alekseyzhelo.lbm.simpleguiapp.algs4.FasterStdDraw
 import com.alekseyzhelo.lbm.simpleguiapp.algs4.drawDensityTable
 import com.alekseyzhelo.lbm.simpleguiapp.algs4.drawVelocityNormTable
@@ -15,7 +17,17 @@ import java.awt.Color
  * @author Aleks on 17-06-2016.
  */
 fun setupLattice(cli: CLISettings): LatticeD2Q9 {
-    val lattice = LatticeD2Q9(cli.lx, cli.ly, BGKDynamicsD2Q9(cli.omega))
+    val boundaries = mapOf(
+            Pair(BoundaryPosition.LEFT, BoundaryType.PERIODIC),
+            Pair(BoundaryPosition.TOP, BoundaryType.PERIODIC),
+            Pair(BoundaryPosition.RIGHT, BoundaryType.PERIODIC),
+            Pair(BoundaryPosition.BOTTOM, BoundaryType.PERIODIC)
+    )
+    return setupLattice(cli, boundaries)
+}
+
+fun setupLattice(cli: CLISettings, boundaries: Map<BoundaryPosition, BoundaryType>): LatticeD2Q9 {
+    val lattice = LatticeD2Q9(cli.lx, cli.ly, BGKDynamicsD2Q9(cli.omega), boundaries)
     print(lattice)
 
     return lattice

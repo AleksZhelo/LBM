@@ -1,7 +1,10 @@
 package com.alekseyzhelo.lbm.simpleguiapp
 
+import com.alekseyzhelo.lbm.boundary.BoundaryPosition
+import com.alekseyzhelo.lbm.boundary.BoundaryType
 import com.alekseyzhelo.lbm.cli.collectArguments
 import com.alekseyzhelo.lbm.functions.multiplePressureWaveRho
+import com.alekseyzhelo.lbm.functions.rowPressureWaveRho
 import com.alekseyzhelo.lbm.simpleguiapp.util.initGraphicsWindow
 import com.alekseyzhelo.lbm.simpleguiapp.util.setupLattice
 import com.alekseyzhelo.lbm.simpleguiapp.util.setupVisualizer
@@ -32,8 +35,16 @@ val squareEmptyRho: (lx: Int, ly: Int, squareX: Int, squareY: Int, squareRho: Do
 
 fun main(args: Array<String>) {
     val cli = collectArguments("SimpleGUIApp.jar", args)
-    val lattice = setupLattice(cli)
-    lattice.iniEquilibrium(multiplePressureWaveRho(cli.lx, cli.ly, 10, 10, 3.0), doubleArrayOf(0.0, 0.0))
+    val boundaries = mapOf(
+            Pair(BoundaryPosition.LEFT, BoundaryType.PERIODIC),
+            Pair(BoundaryPosition.TOP, BoundaryType.NO_SLIP),
+            Pair(BoundaryPosition.RIGHT, BoundaryType.PERIODIC),
+            Pair(BoundaryPosition.BOTTOM, BoundaryType.NO_SLIP)
+    )
+    val lattice = setupLattice(cli, boundaries)
+    //lattice.iniEquilibrium(multiplePressureWaveRho(cli.lx, cli.ly, 1, 1, 3.0), doubleArrayOf(0.0, 0.0))
+    lattice.iniEquilibrium(rowPressureWaveRho(cli.lx, cli.ly, 10, 3.0), doubleArrayOf(0.0, 0.0))
+    //lattice.iniEquilibrium(1.0, doubleArrayOf(0.0, 0.0))
 
     println("Min density: ${lattice.minDensity()}")
     println("Max density: ${lattice.maxDensity()}")
@@ -53,13 +64,17 @@ fun main(args: Array<String>) {
     var time = 0
     val start = System.currentTimeMillis()
     while (time++ < cli.time) {
-        lattice.streamPeriodic()
+        lattice.stream()
         if (noCollisions)
             lattice.swapCellBuffers()
         else
-            lattice.collideParallel()
+            lattice.bulkCollideParallel(0, cli.lx - 1, 0, cli.ly - 1)
         visualize()
+        //println("Min density: ${lattice.minDensity()}")
+        //println("Max density: ${lattice.maxDensity()}")
         //printLine("Total density: ${lattice.totalDensity()}")
+        //printLine("0,0 density: ${lattice.cells[0][0].computeRho()}")
+        //printLine("lx/2,ly/2 density: ${lattice.cells[cli.lx/2][cli.ly/2].computeRho()}")
     }
     time--
     val end = System.currentTimeMillis()
@@ -67,5 +82,7 @@ fun main(args: Array<String>) {
     val formatter = DecimalFormat("#0.00000");
     println("Execution time: ${formatter.format((end - start) / 1000.0)} seconds");
     print("Executed $time LBM steps.")
+
+    printLine("Total density: ${lattice.totalDensity()}")
 }
 

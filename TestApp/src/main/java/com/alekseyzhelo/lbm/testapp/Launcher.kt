@@ -1,11 +1,15 @@
 package com.alekseyzhelo.lbm.testapp
 
+import com.alekseyzhelo.lbm.boundary.BoundaryPosition
+import com.alekseyzhelo.lbm.boundary.BoundaryType
 import com.alekseyzhelo.lbm.cli.CLISettings
 import com.alekseyzhelo.lbm.cli.collectArguments
-import com.alekseyzhelo.lbm.core.dynamics.BGKDynamicsD2Q9
 import com.alekseyzhelo.lbm.core.lattice.LatticeD2Q9
+import com.alekseyzhelo.lbm.dynamics.BGKDynamicsD2Q9
 import com.alekseyzhelo.lbm.functions.pressureWaveRho
-import com.alekseyzhelo.lbm.testapp.curses.*
+import com.alekseyzhelo.lbm.testapp.curses.blue
+import com.alekseyzhelo.lbm.testapp.curses.drawPressureRatedTable
+import com.alekseyzhelo.lbm.testapp.curses.drawVelocityRatedTable
 import com.alekseyzhelo.lbm.util.*
 import jcurses.system.Toolkit
 
@@ -33,16 +37,16 @@ fun main(args: Array<String>) {
         true -> lattice.drawVelocityRatedTable(0.0, maxVelocityNorm, velocityRatedValue)
         false -> lattice.drawPressureRatedTable(minPressure, maxPressure, pressureRatedValue)
     }
-    Toolkit.readCharacter()
+    if (cli.stop) Toolkit.readCharacter()
     //printLine("Total density: ${lattice.totalDensity()}")
 
     var time = 0
     while (time++ < cli.time) {
-        lattice.streamPeriodic()
+        lattice.stream()
         if (cli.noCollisions)
             lattice.swapCellBuffers()
         else
-            lattice.collide()
+            lattice.bulkCollide(0, cli.lx - 1, 0, cli.ly - 1)
         when (cli.drawVelocities) {
             true -> lattice.drawVelocityRatedTable(0.0, maxVelocityNorm, velocityRatedValue)
             false -> lattice.drawPressureRatedTable(minPressure, maxPressure, pressureRatedValue)
@@ -58,7 +62,13 @@ fun main(args: Array<String>) {
 
 
 private fun setupLattice(cli: CLISettings): LatticeD2Q9 {
-    val lattice = LatticeD2Q9(cli.lx, cli.ly, BGKDynamicsD2Q9(cli.omega))
+    val boundaries = mapOf(
+            Pair(BoundaryPosition.LEFT, BoundaryType.PERIODIC),
+            Pair(BoundaryPosition.TOP, BoundaryType.PERIODIC),
+            Pair(BoundaryPosition.RIGHT, BoundaryType.PERIODIC),
+            Pair(BoundaryPosition.BOTTOM, BoundaryType.PERIODIC)
+    )
+    val lattice = LatticeD2Q9(cli.lx, cli.ly, BGKDynamicsD2Q9(cli.omega), boundaries)
     print(lattice)
 
     return lattice

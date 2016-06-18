@@ -45,13 +45,15 @@ internal fun drawScalarValue(value: Double, i: Int, j: Int, LX: Int, LY: Int,
                              minValue: Double, maxValue: Double): Unit {
     val color = cellColor(normalize(value, minValue, maxValue))
     FasterStdDraw.setPenColor(color);
-    FasterStdDraw.deferredFilledSquareTest((i).toDouble(), (LY - j).toDouble(), 1.0); // double r
+    // FasterStdDraw.deferredFilledSquareTest((i).toDouble(), (LY - j).toDouble(), 1.0); // double r
+    // TODO: why is j + 1 necessary? j leaves an empty row at the top..
+    FasterStdDraw.deferredFilledSquareTest((i).toDouble(), (j + 1).toDouble(), 1.0); // double r
 }
 
 // TODO: fix for non-square lattice
 fun LatticeD2Q9.drawDensityTable(minDensity: Double, maxDensity: Double): Unit {
-    for (j in cells[0].size - 1 downTo 0) {
-        for (i in cells.indices) {
+    for (i in cells.indices) {
+        for (j in cells[0].indices) {
             drawScalarValue(cells[i][j].computeRho(cells[i][j].f), i, j, LX, LY, minDensity, maxDensity)
         }
     }
@@ -59,8 +61,8 @@ fun LatticeD2Q9.drawDensityTable(minDensity: Double, maxDensity: Double): Unit {
 
 // TODO: fix for non-square lattice
 fun LatticeD2Q9.drawVelocityNormTable(minVelocityNorm: Double, maxVelocityNorm: Double): Unit {
-    for (j in cells[0].size - 1 downTo 0) {
-        for (i in cells.indices) {
+    for (i in cells.indices) {
+        for (j in cells[0].indices) {
             drawScalarValue(
                     norm(cells[i][j].computeRhoU(cells[i][j].f)),
                     i, j, LX, LY, minVelocityNorm, maxVelocityNorm

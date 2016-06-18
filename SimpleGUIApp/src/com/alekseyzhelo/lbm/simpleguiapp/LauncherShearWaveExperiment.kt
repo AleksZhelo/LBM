@@ -91,11 +91,11 @@ fun main(args: Array<String>) {
     samples.add(sampleAverageXSpeed(lattice, sampleY))
     xSamples.add(sampleXSpeed(lattice, sampleX))
     while (time++ < cli.time) {
-        lattice.streamPeriodic()
+        lattice.stream()
         if (cli.noCollisions)
             lattice.swapCellBuffers()
         else
-            lattice.collideParallel()
+            lattice.bulkCollideParallel(0, cli.lx - 1, 0, cli.ly - 1)
         samples.add(sampleAverageXSpeed(lattice, sampleY))
         if (time % 10 == 0)
             xSamples.add(sampleXSpeed(lattice, sampleX))

@@ -35,13 +35,23 @@ val multiplePressureWaveRho: (lx: Int, ly: Int, waveX: Int, waveY: Int, waveCent
             }
         }
 
-val columnPressureWaveRho: (lx: Int, ly: Int, waveXpos: Int, waveCenterRho: Double) -> (i: Int, j: Int) -> Double
-        =
-        { lx, ly, waveXpos, waveCenterRho ->
-            val balancedRho = 1.0 - (ly * (waveCenterRho - 1.0)) / (lx * ly)
+val columnPressureWaveRho =
+        { lx: Int, ly: Int, waveXPos: Int, waveRho: Double ->
+            val balancedRho = 1.0 - (ly * (waveRho - 1.0)) / (lx * ly)
             { i: Int, j: Int ->
                 when {
-                    (i == waveXpos) -> waveCenterRho
+                    (i == waveXPos) -> waveRho
+                    else -> balancedRho
+                }
+            }
+        }
+
+val rowPressureWaveRho =
+        { lx: Int, ly: Int, waveYPos: Int, waveRho: Double ->
+            val balancedRho = 1.0 - (lx * (waveRho - 1.0)) / (lx * ly)
+            { i: Int, j: Int ->
+                when {
+                    (j == waveYPos) -> waveRho
                     else -> balancedRho
                 }
             }
@@ -66,7 +76,7 @@ val shearWaveVelocity = { L: Double, kNum: Int, a0: Double ->
     }
 }
 
-val shearWaveMaxVelocityY = {L: Double, kNum: Int ->
+val shearWaveMaxVelocityY = { L: Double, kNum: Int ->
     val period = L / (1 + kNum).toDouble()
     (period / 4).toInt()
 }

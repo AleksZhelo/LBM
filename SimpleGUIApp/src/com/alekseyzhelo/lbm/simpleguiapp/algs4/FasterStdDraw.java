@@ -270,6 +270,7 @@ public final class FasterStdDraw implements ActionListener, MouseListener, Mouse
         RenderingHints hints = new RenderingHints(RenderingHints.KEY_RENDERING,
                 RenderingHints.VALUE_RENDER_SPEED);
         hints.put(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_SPEED);
+//        hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         offscreen.addRenderingHints(hints);
 
         // frame stuff

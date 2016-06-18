@@ -1,4 +1,4 @@
-package com.alekseyzhelo.lbm.core.dynamics
+package com.alekseyzhelo.lbm.dynamics
 
 import com.alekseyzhelo.lbm.core.cell.CellD2Q9
 import com.alekseyzhelo.lbm.core.lattice.DescriptorD2Q9.c

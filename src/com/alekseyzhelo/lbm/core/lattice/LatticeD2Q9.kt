@@ -1,7 +1,11 @@
 package com.alekseyzhelo.lbm.core.lattice
 
+import com.alekseyzhelo.lbm.boundary.BoundaryCondition
+import com.alekseyzhelo.lbm.boundary.BoundaryPosition
+import com.alekseyzhelo.lbm.boundary.BoundaryType
+import com.alekseyzhelo.lbm.boundary.D2BoundaryFactory
 import com.alekseyzhelo.lbm.core.cell.CellD2Q9
-import com.alekseyzhelo.lbm.core.dynamics.Dynamics2DQ9
+import com.alekseyzhelo.lbm.dynamics.Dynamics2DQ9
 import java.util.stream.IntStream
 
 /**
@@ -12,47 +16,91 @@ import java.util.stream.IntStream
 // TODO: units
 // TODO?: boundary conditions
 // TODO?: solids, etc
-open class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9) {
+class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundaries: Map<BoundaryPosition, BoundaryType>) {
 
-    val cells = Array(LX, { x -> Array(LY, { x -> CellD2Q9() }) })
+    val cells = Array(LX, { column -> Array(LY, { cell -> CellD2Q9() }) })
 
-    fun streamPeriodic(): Unit {
-        for (i in cells.indices) { // over X
-            val iSub = if (i > 0) (i - 1) else (LX - 1)
-            val iPlus = if (i < LX - 1) (i + 1) else (0)
-            for (j in cells[i].indices) { //over Y // TODO performance?
-                val jSub = if (j > 0) (j - 1) else (LY - 1)
-                val jPlus = if (j < LY - 1) (j + 1) else (0)
+    private val leftBoundary: BoundaryCondition
+    private val topBoundary: BoundaryCondition
+    private val rightBoundary: BoundaryCondition
+    private val bottomBoundary: BoundaryCondition
+
+    init {
+        val maxX = LX - 1
+        val maxY = LY - 1
+
+        leftBoundary = D2BoundaryFactory.create(
+                BoundaryPosition.LEFT,
+                boundaries[BoundaryPosition.LEFT]!!, this,
+                //0, 0, 0, maxY
+                0, 0, 1, maxY - 1
+        )
+        topBoundary = D2BoundaryFactory.create(
+                BoundaryPosition.TOP,
+                boundaries[BoundaryPosition.TOP]!!, this,
+                1, maxX - 1, maxY, maxY
+        )
+        rightBoundary = D2BoundaryFactory.create(
+                BoundaryPosition.RIGHT,
+                boundaries[BoundaryPosition.RIGHT]!!, this,
+                maxX, maxX, 1, maxY - 1
+        )
+        bottomBoundary = D2BoundaryFactory.create(
+                BoundaryPosition.BOTTOM,
+                boundaries[BoundaryPosition.BOTTOM]!!, this,
+                1, maxX - 1, 0, 0
+        )
+    }
+
+    // TODO here the lattice velocity is hardcoded to be 1
+    private fun innerStream(x0: Int, x1: Int, y0: Int, y1: Int): Unit {
+        for (i in x0..x1) {
+            for (j in y0..y1) {
                 // TODO if (!is_interior_solid_node[i][j]) {
-                cells[i][j].fBuf[0] = cells[i][j].f[0];
-                cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
-                cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
-                cells[iSub][j].fBuf[3] = cells[i][j].f[3];
-                cells[i][jSub].fBuf[4] = cells[i][j].f[4];
-                cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
-                cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
-                cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
-                cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
+                doStream(i, i + 1, i - 1, j, j + 1, j - 1)
                 // TODO }
             }
         }
     }
 
-    fun collide(): Unit {
-        for (i in cells.indices) {
-            for (j in cells[i].indices) { // TODO performance?
+    fun doStream(i: Int, iPlus: Int, iSub: Int, j: Int, jPlus: Int, jSub: Int) {
+        cells[i][j].fBuf[0] = cells[i][j].f[0];
+        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
+        cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
+        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
+        cells[i][jSub].fBuf[4] = cells[i][j].f[4];
+        cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
+        cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
+        cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
+        cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
+    }
+
+    fun bulkCollide(x0: Int, x1: Int, y0: Int, y1: Int): Unit {
+        for (i in x0..x1) {
+            for (j in y0..y1) { // TODO performance?
                 dynamics.collide(cells[i][j])
             }
         }
     }
 
-    fun collideParallel(): Unit {
-        IntStream.range(0, LX)
+    fun bulkCollideParallel(x0: Int, x1: Int, y0: Int, y1: Int): Unit {
+        IntStream.range(x0, x1 + 1)
                 .parallel()
                 .forEach { i ->
-                    IntStream.range(0, LY)
+                    IntStream.range(y0, y1 + 1)
                             .forEach { j -> dynamics.collide(cells[i][j]) }
                 }
+    }
+
+    fun stream(): Unit {
+        innerStream(1, LX - 2, 1, LY - 2)
+        leftBoundary.boundaryStream()
+        topBoundary.boundaryStream()
+        rightBoundary.boundaryStream()
+        bottomBoundary.boundaryStream()
+
+        //fullPeriodicCorners()
+        slipAndPeriodicCorners()
     }
 
     fun iniEquilibrium(Rho: Double, U: DoubleArray): Unit { // constant U for the whole lattice
@@ -117,4 +165,155 @@ open class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9) {
         }
     }
 
+    private fun fullPeriodicCorners() {
+        //left bottom
+        var i = 0
+        var j = 0
+        var iPlus = i + 1
+        var iSub = LX - 1
+        var jPlus = j + 1
+        var jSub = LY - 1
+
+        cells[i][j].fBuf[0] = cells[i][j].f[0];
+        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
+        cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
+        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
+        cells[i][jSub].fBuf[4] = cells[i][j].f[4];
+        cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
+        cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
+        cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
+        cells[iPlus][jSub].fBuf[8] += cells[i][j].f[8];
+
+        // right bottom
+        i = LX - 1
+        j = 0
+        iPlus = 0
+        iSub = i - 1
+        jPlus = j + 1
+        jSub = LY - 1
+
+        cells[i][j].fBuf[0] = cells[i][j].f[0];
+        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
+        cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
+        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
+        cells[i][jSub].fBuf[4] = cells[i][j].f[4];
+        cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
+        cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
+        cells[iSub][jSub].fBuf[7] += cells[i][j].f[7];
+        cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
+
+        // left top
+        i = 0
+        j = LY - 1
+        iPlus = i + 1
+        iSub = LX - 1
+        jPlus = 0
+        jSub = j - 1
+
+        cells[i][j].fBuf[0] = cells[i][j].f[0];
+        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
+        cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
+        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
+        cells[i][jSub].fBuf[4] = cells[i][j].f[4];
+        cells[iPlus][jPlus].fBuf[5] += cells[i][j].f[5];
+        cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
+        cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
+        cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
+
+        // right top
+        i = LX - 1
+        j = LY - 1
+        iPlus = 0
+        iSub = i - 1
+        jPlus = 0
+        jSub = j - 1
+
+        cells[i][j].fBuf[0] = cells[i][j].f[0];
+        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
+        cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
+        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
+        cells[i][jSub].fBuf[4] = cells[i][j].f[4];
+        cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
+        cells[iSub][jPlus].fBuf[6] += cells[i][j].f[6];
+        cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
+        cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
+    }
+
+    private fun slipAndPeriodicCorners() {
+        // left bottom
+        var i = 0
+        var j = 0
+        var iPlus = i + 1
+        var iSub = LX - 1
+        var jPlus = j + 1
+        var jSub = LY - 1
+
+        cells[i][j].fBuf[0] = cells[i][j].f[0];
+        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
+        cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
+        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
+        cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
+        cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
+
+        cells[i][j].fBuf[2] = cells[i][j].f[4];
+        cells[i][j].fBuf[5] = cells[i][j].f[7];
+        cells[i][j].fBuf[6] = cells[i][j].f[8];
+
+        // right bottom
+        i = LX - 1
+        j = 0
+        iPlus = 0
+        iSub = i - 1
+        jPlus = j + 1
+        jSub = LY - 1
+
+        cells[i][j].fBuf[0] = cells[i][j].f[0];
+        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
+        cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
+        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
+        cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
+        cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
+
+        cells[i][j].fBuf[2] = cells[i][j].f[4];
+        cells[i][j].fBuf[5] = cells[i][j].f[7];
+        cells[i][j].fBuf[6] = cells[i][j].f[8];
+
+        // left top
+        i = 0
+        j = LY - 1
+        iPlus = i + 1
+        iSub = LX - 1
+        jPlus = 0
+        jSub = j - 1
+
+        cells[i][j].fBuf[0] = cells[i][j].f[0];
+        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
+        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
+        cells[i][jSub].fBuf[4] = cells[i][j].f[4];
+        cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
+        cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
+
+        cells[i][j].fBuf[4] = cells[i][j].f[2];
+        cells[i][j].fBuf[7] = cells[i][j].f[5];
+        cells[i][j].fBuf[8] = cells[i][j].f[6];
+
+        // right top
+        i = LX - 1
+        j = LY - 1
+        iPlus = 0
+        iSub = i - 1
+        jPlus = 0
+        jSub = j - 1
+
+        cells[i][j].fBuf[0] = cells[i][j].f[0];
+        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
+        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
+        cells[i][jSub].fBuf[4] = cells[i][j].f[4];
+        cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
+        cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
+
+        cells[i][j].fBuf[4] = cells[i][j].f[2];
+        cells[i][j].fBuf[7] = cells[i][j].f[5];
+        cells[i][j].fBuf[8] = cells[i][j].f[6];
+    }
 }
