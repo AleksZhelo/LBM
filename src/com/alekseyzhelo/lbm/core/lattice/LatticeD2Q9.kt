@@ -11,11 +11,11 @@ import java.util.stream.IntStream
 /**
  * @author Aleks on 17-05-2016.
  */
-// TODO: initialization
 // TODO: some kind of statistics, output, etc
 // TODO: units
 // TODO?: boundary conditions
 // TODO?: solids, etc
+// TODO: decouple corner handling
 class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundaries: Map<BoundaryPosition, BoundaryType>) {
 
     val cells = Array(LX, { column -> Array(LY, { cell -> CellD2Q9() }) })

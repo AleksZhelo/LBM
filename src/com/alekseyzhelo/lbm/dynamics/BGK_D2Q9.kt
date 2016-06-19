@@ -9,7 +9,7 @@ import com.alekseyzhelo.lbm.core.lattice.DescriptorD2Q9.w
  */
 
 
-class BGKDynamicsD2Q9(val omega: Double) : Dynamics2DQ9 {
+open class BGKDynamicsD2Q9(val omega: Double) : Dynamics2DQ9 {
 
     // TODO field vs local var vs .. performance effect?
     val eqMult1 = 3.0

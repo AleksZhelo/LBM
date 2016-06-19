@@ -5,6 +5,7 @@ import com.alekseyzhelo.lbm.boundary.BoundaryType
 import com.alekseyzhelo.lbm.cli.CLISettings
 import com.alekseyzhelo.lbm.core.lattice.LatticeD2Q9
 import com.alekseyzhelo.lbm.dynamics.BGKDynamicsD2Q9
+import com.alekseyzhelo.lbm.dynamics.Dynamics2DQ9
 import com.alekseyzhelo.lbm.simpleguiapp.algs4.FasterStdDraw
 import com.alekseyzhelo.lbm.simpleguiapp.algs4.drawDensityTable
 import com.alekseyzhelo.lbm.simpleguiapp.algs4.drawVelocityNormTable
@@ -27,7 +28,11 @@ fun setupLattice(cli: CLISettings): LatticeD2Q9 {
 }
 
 fun setupLattice(cli: CLISettings, boundaries: Map<BoundaryPosition, BoundaryType>): LatticeD2Q9 {
-    val lattice = LatticeD2Q9(cli.lx, cli.ly, BGKDynamicsD2Q9(cli.omega), boundaries)
+    return setupLattice(cli, BGKDynamicsD2Q9(cli.omega), boundaries)
+}
+
+fun setupLattice(cli: CLISettings, dynamics: Dynamics2DQ9, boundaries: Map<BoundaryPosition, BoundaryType>): LatticeD2Q9 {
+    val lattice = LatticeD2Q9(cli.lx, cli.ly, dynamics, boundaries)
     print(lattice)
 
     return lattice

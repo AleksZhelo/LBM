@@ -1,63 +1,18 @@
 package com.alekseyzhelo.lbm.simpleguiapp
 
 import com.alekseyzhelo.lbm.cli.collectArguments
-import com.alekseyzhelo.lbm.core.lattice.LatticeD2Q9
 import com.alekseyzhelo.lbm.functions.shearWaveMaxVelocityY
 import com.alekseyzhelo.lbm.functions.shearWaveVelocity
-import com.alekseyzhelo.lbm.simpleguiapp.util.initGraphicsWindow
-import com.alekseyzhelo.lbm.simpleguiapp.util.setupLattice
-import com.alekseyzhelo.lbm.simpleguiapp.util.setupVisualizer
+import com.alekseyzhelo.lbm.simpleguiapp.util.*
 import com.alekseyzhelo.lbm.util.*
-import java.nio.file.Files
-import java.nio.file.Paths
+import sampleAverageXSpeed
+import sampleXSpeed
 import java.text.SimpleDateFormat
 import java.util.*
 
 /**
  * @author Aleks on 18-05-2016.
  */
-
-private fun sampleAverageXSpeed(lattice: LatticeD2Q9, atY: Int): Double {
-    var speed = 0.0
-    for (x in lattice.cells.indices) {
-        speed += lattice.cells[x][atY].computeRhoU(lattice.cells[x][atY].f)[0];
-    }
-    speed /= lattice.cells.size
-
-    return speed
-}
-
-private fun sampleXSpeed(lattice: LatticeD2Q9, atX: Int): DoubleArray {
-    val speed = ArrayList<Double>()
-    for (y in lattice.cells[atX].indices) {
-        speed.add(lattice.cells[atX][y].computeRhoU(lattice.cells[atX][y].f)[0])
-    }
-
-    return speed.toDoubleArray()
-}
-
-// TODO: fix JVM signature and use the same name
-private fun ArrayList<DoubleArray>.toDoubleArrayFile(filename: String) {
-    val path = Paths.get(filename)
-    Files.newOutputStream(path).bufferedWriter().use {
-        for (a in this) {
-            for (d in a) {
-                it.write("$d ")
-            }
-            it.newLine()
-        }
-    }
-}
-
-private fun ArrayList<Double>.toFile(filename: String) {
-    val path = Paths.get(filename)
-    Files.newOutputStream(path).bufferedWriter().use {
-        for (d in this) {
-            it.write("$d ")
-        }
-    }
-}
-
 
 fun main(args: Array<String>) {
     val cli = collectArguments("SimpleGUIApp.jar", args)
