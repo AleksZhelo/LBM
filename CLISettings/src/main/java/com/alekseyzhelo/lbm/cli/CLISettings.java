@@ -25,6 +25,9 @@ public class CLISettings {
     @Parameter(names = {"--draw-velocities", "-vel"}, description = "Will draw velocities (instead of pressures).")
     private Boolean drawVelocities = false;
 
+    @Parameter(names = {"--vector-field", "-vf"}, description = "Will draw the velocities as a vector field.")
+    private Boolean vectorField = false;
+
     @Parameter(names = {"--stop", "-s"}, description = "Wait for any key input before starting the simulation.")
     private Boolean stop = false;
 
@@ -58,6 +61,10 @@ public class CLISettings {
 
     public Boolean getDrawVelocities() {
         return drawVelocities;
+    }
+
+    public Boolean getVectorField() {
+        return vectorField;
     }
 
     public Boolean getStop() {

@@ -9,6 +9,7 @@ import com.alekseyzhelo.lbm.dynamics.Dynamics2DQ9
 import com.alekseyzhelo.lbm.simpleguiapp.algs4.FasterStdDraw
 import com.alekseyzhelo.lbm.simpleguiapp.algs4.drawDensityTable
 import com.alekseyzhelo.lbm.simpleguiapp.algs4.drawVelocityNormTable
+import com.alekseyzhelo.lbm.simpleguiapp.algs4.drawVelocityVectorTable
 import com.alekseyzhelo.lbm.util.maxDensity
 import com.alekseyzhelo.lbm.util.maxVelocityNorm
 import com.alekseyzhelo.lbm.util.minDensity
@@ -17,21 +18,38 @@ import java.awt.Color
 /**
  * @author Aleks on 17-06-2016.
  */
+
+fun createBoundaries(
+        left: BoundaryType,
+        top: BoundaryType,
+        right: BoundaryType,
+        bottom: BoundaryType,
+        lParam: Double? = null,
+        tParam: Double? = null,
+        rParam: Double? = null,
+        bParam: Double? = null
+) = mapOf(
+        Pair(BoundaryPosition.LEFT, Pair(left, lParam)),
+        Pair(BoundaryPosition.TOP, Pair(top, tParam)),
+        Pair(BoundaryPosition.RIGHT, Pair(right, rParam)),
+        Pair(BoundaryPosition.BOTTOM, Pair(bottom, bParam))
+)
+
 fun setupLattice(cli: CLISettings): LatticeD2Q9 {
-    val boundaries = mapOf(
-            Pair(BoundaryPosition.LEFT, BoundaryType.PERIODIC),
-            Pair(BoundaryPosition.TOP, BoundaryType.PERIODIC),
-            Pair(BoundaryPosition.RIGHT, BoundaryType.PERIODIC),
-            Pair(BoundaryPosition.BOTTOM, BoundaryType.PERIODIC)
+    val boundaries = createBoundaries(
+            BoundaryType.PERIODIC,
+            BoundaryType.PERIODIC,
+            BoundaryType.PERIODIC,
+            BoundaryType.PERIODIC
     )
     return setupLattice(cli, boundaries)
 }
 
-fun setupLattice(cli: CLISettings, boundaries: Map<BoundaryPosition, BoundaryType>): LatticeD2Q9 {
+fun setupLattice(cli: CLISettings, boundaries: Map<BoundaryPosition, Pair<BoundaryType, Double?>>): LatticeD2Q9 {
     return setupLattice(cli, BGKDynamicsD2Q9(cli.omega), boundaries)
 }
 
-fun setupLattice(cli: CLISettings, dynamics: Dynamics2DQ9, boundaries: Map<BoundaryPosition, BoundaryType>): LatticeD2Q9 {
+fun setupLattice(cli: CLISettings, dynamics: Dynamics2DQ9, boundaries: Map<BoundaryPosition, Pair<BoundaryType, Double?>>): LatticeD2Q9 {
     val lattice = LatticeD2Q9(cli.lx, cli.ly, dynamics, boundaries)
     print(lattice)
 
@@ -48,10 +66,18 @@ fun setupVisualizer(cli: CLISettings, lattice: LatticeD2Q9, delay: Int = 25): ()
             val velocityMax = if (cli.noRescale) { -> maxVelocityNorm } else { -> lattice.maxVelocityNorm() }
             val densityMin = if (cli.noRescale) { -> minDensity } else { -> lattice.minDensity() }
             val densityMax = if (cli.noRescale) { -> maxDensity } else { -> lattice.maxDensity() }
+
+            val drawVelocities = cli.drawVelocities
+            val vectorField = cli.vectorField
             {
                 FasterStdDraw.clear(Color.BLACK)
-                when (cli.drawVelocities) {
-                    true -> lattice.drawVelocityNormTable(0.0, velocityMax())
+                when (drawVelocities) {
+                    true -> {
+                        when (vectorField) {
+                            true -> lattice.drawVelocityVectorTable(0.0, velocityMax())
+                            false -> lattice.drawVelocityNormTable(0.0, velocityMax())
+                        }
+                    }
                     false -> lattice.drawDensityTable(densityMin(), densityMax())
                 }
                 FasterStdDraw.show(delay);

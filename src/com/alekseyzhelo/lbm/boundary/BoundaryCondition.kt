@@ -10,7 +10,7 @@ enum class BoundaryPosition {
 }
 
 enum class BoundaryType {
-    PERIODIC, NO_SLIP
+    PERIODIC, NO_SLIP, SLIDING
 }
 
 // TODO: handle corners automatically!
@@ -18,5 +18,7 @@ abstract class BoundaryCondition(protected val lattice: LatticeD2Q9,
                                  val x0: Int, val x1: Int, val y0: Int, val y1: Int) {
 
     abstract fun boundaryStream()
+    abstract fun getType(): BoundaryType
+    abstract fun getParam(): Double?
 
 }

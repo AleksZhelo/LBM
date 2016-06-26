@@ -621,6 +621,77 @@ public final class FasterStdDraw implements ActionListener, MouseListener, Mouse
         offscreen.fill(drawRect);
     }
 
+    /**
+     * Thanks to http://stackoverflow.com/a/27461352
+     * Draw an arrow line between two points
+     *
+     * @param x1 x-position of first point
+     * @param y1 y-position of first point
+     * @param x2 x-position of second point
+     * @param y2 y-position of second point
+     * @param d  the width of the arrow
+     * @param h  the height of the arrow
+     */
+    public static void drawArrowLine(int x1, int y1, int x2, int y2, int d, int h) {
+        int dx = x2 - x1, dy = y2 - y1;
+        double D = Math.sqrt(dx * dx + dy * dy);
+        double xm = D - d, xn = xm, ym = h, yn = -h, x;
+        double sin = dy / D, cos = dx / D;
+
+        x = xm * cos - ym * sin + x1;
+        ym = xm * sin + ym * cos + y1;
+        xm = x;
+
+        x = xn * cos - yn * sin + x1;
+        yn = xn * sin + yn * cos + y1;
+        xn = x;
+
+        int[] xpoints = {x2, (int) xm, (int) xn};
+        int[] ypoints = {y2, (int) ym, (int) yn};
+
+        offscreen.drawLine(x1, y1, x2, y2);
+        offscreen.fillPolygon(xpoints, ypoints, 3);
+    }
+
+    /**
+     * Thanks to http://stackoverflow.com/a/27461352
+     * Draw an arrow line between two points
+     *
+     * @param x1 x-position of first point
+     * @param y1 y-position of first point
+     * @param x2 x-position of second point
+     * @param y2 y-position of second point
+     * @param d  the width of the arrow
+     * @param h  the height of the arrow
+     */
+    public static void drawArrowLineTest(double x1, double y1, double x2, double y2, double d, double h) {
+        x1 = width * (x1 - xmin) / precalcXScale;
+        x2 = width * (x2 - xmin) / precalcXScale;
+        y1 = height * (ymax - y1) / precalcYScale;
+        y2 = height * (ymax - y2) / precalcYScale;
+        d = d * precalcFactorX;
+        h = h * precalcFactorY;
+
+        int dx = (int) (x2 - x1), dy = (int) (y2 - y1);
+        double D = Math.sqrt(dx * dx + dy * dy);
+        double xm = D - d, xn = xm, ym = h, yn = -h, x;
+        double sin = dy / D, cos = dx / D;
+
+        x = xm * cos - ym * sin + x1;
+        ym = xm * sin + ym * cos + y1;
+        xm = x;
+
+        x = xn * cos - yn * sin + x1;
+        yn = xn * sin + yn * cos + y1;
+        xn = x;
+
+        int[] xpoints = {(int) x2, (int) xm, (int) xn};
+        int[] ypoints = {(int) y2, (int) ym, (int) yn};
+
+        offscreen.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
+        offscreen.fillPolygon(xpoints, ypoints, 3);
+    }
+
     /***************************************************************************
      *  Drawing text.
      ***************************************************************************/

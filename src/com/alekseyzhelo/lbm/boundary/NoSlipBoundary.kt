@@ -6,6 +6,14 @@ class NoSlipBoundary(val position: BoundaryPosition, lattice: LatticeD2Q9,
                      x0: Int, x1: Int, y0: Int, y1: Int) : BoundaryCondition(lattice, x0, x1, y0, y1) {
     val cells = lattice.cells
 
+    override fun getType(): BoundaryType {
+        return BoundaryType.NO_SLIP
+    }
+
+    override fun getParam(): Double? {
+        return null
+    }
+
     override fun boundaryStream() {
         when (position) {
             BoundaryPosition.LEFT -> {

@@ -5,6 +5,14 @@ import com.alekseyzhelo.lbm.core.lattice.LatticeD2Q9
 class PeriodicBoundary(lattice: LatticeD2Q9,
                        x0: Int, x1: Int, y0: Int, y1: Int) : BoundaryCondition(lattice, x0, x1, y0, y1) {
 
+    override fun getType(): BoundaryType {
+        return BoundaryType.PERIODIC
+    }
+
+    override fun getParam(): Double? {
+        return null
+    }
+
     override fun boundaryStream() {
         val LX = lattice.LX
         val LY = lattice.LY

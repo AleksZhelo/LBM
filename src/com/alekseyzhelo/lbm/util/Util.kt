@@ -1,6 +1,7 @@
 package com.alekseyzhelo.lbm.util
 
 import java.text.DecimalFormat
+import java.util.*
 
 /**
  * @author Aleks on 28-05-2016.
@@ -33,6 +34,15 @@ fun scalarProduct(U: DoubleArray, V: DoubleArray): Double {
         prod += U[i] * V[i];
     }
     return prod;
+}
+
+fun normalize(U: DoubleArray): DoubleArray {
+    val norm = norm(U)
+    val ortVector = Arrays.copyOf(U, U.size)
+    for (i in ortVector.indices) {
+        ortVector[i] /= norm
+    }
+    return ortVector;
 }
 
 private val doubleFormat = DecimalFormat("+0.000;-0.000")

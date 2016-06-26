@@ -1,14 +1,14 @@
 package com.alekseyzhelo.lbm.simpleguiapp
 
-import com.alekseyzhelo.lbm.boundary.BoundaryPosition
 import com.alekseyzhelo.lbm.boundary.BoundaryType
 import com.alekseyzhelo.lbm.cli.collectArguments
-import com.alekseyzhelo.lbm.dynamics.ConstantXForce_BGK_D2Q9
-import com.alekseyzhelo.lbm.functions.columnPressureWaveRho
-import com.alekseyzhelo.lbm.functions.multiplePressureWaveRho
-import com.alekseyzhelo.lbm.functions.shearWaveVelocity
-import com.alekseyzhelo.lbm.simpleguiapp.util.*
-import com.alekseyzhelo.lbm.util.*
+import com.alekseyzhelo.lbm.simpleguiapp.util.createBoundaries
+import com.alekseyzhelo.lbm.simpleguiapp.util.initGraphicsWindow
+import com.alekseyzhelo.lbm.simpleguiapp.util.setupLattice
+import com.alekseyzhelo.lbm.simpleguiapp.util.setupVisualizer
+import com.alekseyzhelo.lbm.util.maxDensity
+import com.alekseyzhelo.lbm.util.maxVelocityNorm
+import com.alekseyzhelo.lbm.util.minDensity
 import sampleXSpeedAveragedByX
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -18,33 +18,21 @@ import java.util.*
  * @author Aleks on 18-05-2016.
  */
 
-val squareEmptyRho: (lx: Int, ly: Int, squareX: Int, squareY: Int, squareRho: Double) -> (i: Int, j: Int) -> Double
-        =
-        { lx, ly, squareX, squareY, squareRho ->
-            val balancedRho = 1.0 + (squareX * squareY * (1.0 - squareRho)) /
-                    (lx * ly - squareX * squareY).toDouble()
-            val centerX = lx / 2
-            val centerY = ly / 2
-            { i: Int, j: Int ->
-                when {
-                    (i >= centerX - squareX / 2) && (i <= centerX + squareX / 2)
-                            && (j >= centerY - squareY / 2) && (j <= centerY + squareY / 2) -> squareRho
-                    else -> balancedRho
-                }
-            }
-        }
-
-
 fun main(args: Array<String>) {
     val cli = collectArguments("SimpleGUIApp.jar", args)
     val boundaries = createBoundaries(
-            BoundaryType.PERIODIC,
-            BoundaryType.NO_SLIP,
-            BoundaryType.PERIODIC,
-            BoundaryType.NO_SLIP
+            BoundaryType.NO_SLIP, // left
+            BoundaryType.SLIDING, // top
+            BoundaryType.NO_SLIP, // right
+            BoundaryType.NO_SLIP, // bottom
+            tParam = 0.1,
+            bParam = 0.001
     )
     val force = 0.00001
-    val lattice = setupLattice(cli, ConstantXForce_BGK_D2Q9(cli.omega, force), boundaries)
+    val lattice = setupLattice(cli, boundaries) //ConstantXForce_BGK_D2Q9(cli.omega, force), boundaries)
+    //lattice.iniEquilibrium(multiplePressureWaveRho(cli.lx, cli.ly, 4, 4, 4.5), doubleArrayOf(0.0, 0.0))
+    //lattice.iniEquilibrium(squareEmptyRho(cli.lx, cli.ly, 4, 4, 0.1), doubleArrayOf(0.0, 0.0))
+    //lattice.iniEquilibrium(columnPressureWaveRho(cli.lx, cli.ly, 10, 10.5), doubleArrayOf(0.0, 0.0))
     lattice.iniEquilibrium(1.0, doubleArrayOf(0.0, 0.0))
 
     println("Min density: ${lattice.minDensity()}")
@@ -73,6 +61,10 @@ fun main(args: Array<String>) {
         else
             lattice.bulkCollideParallel(0, cli.lx - 1, 0, cli.ly - 1)
         visualize()
+        if (time % 50 == 0) {
+            printLine("Max velocity: ${lattice.maxVelocityNorm()}")
+            printLine("Total density: ${lattice.totalDensity()}")
+        }
 //        if (time % 300 == 0) {
 //            ySamples.add(sampleXSpeedAveragedByX(lattice))
 //        }

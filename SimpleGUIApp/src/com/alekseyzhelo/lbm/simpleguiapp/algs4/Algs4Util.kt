@@ -40,8 +40,7 @@ internal fun cellColor(normalized: Double): Color {
     return blueRedGradient((normalized * 255).toInt())
 }
 
-// TODO: fix for non-square lattice
-internal fun drawScalarValue(value: Double, i: Int, j: Int, LX: Int, LY: Int,
+internal fun drawScalarValue(value: Double, i: Int, j: Int,
                              minValue: Double, maxValue: Double): Unit {
     val color = cellColor(normalize(value, minValue, maxValue))
     FasterStdDraw.setPenColor(color);
@@ -50,22 +49,40 @@ internal fun drawScalarValue(value: Double, i: Int, j: Int, LX: Int, LY: Int,
     FasterStdDraw.deferredFilledSquareTest((i).toDouble(), (j + 1).toDouble(), 1.0); // double r
 }
 
-// TODO: fix for non-square lattice
+internal fun drawVectorValue(value: DoubleArray, i: Int, j: Int,
+                             minValue: Double, maxValue: Double): Unit {
+    val color = cellColor(normalize(norm(value), minValue, maxValue))
+    val ort = normalize(value)
+    FasterStdDraw.setPenColor(color);
+    // FasterStdDraw.deferredFilledSquareTest((i).toDouble(), (j + 1).toDouble(),  1.0); // double r
+    FasterStdDraw.drawArrowLineTest((i).toDouble(), (j).toDouble(), i + ort[0], j + ort[1], 0.3, 0.2);
+}
+
 fun LatticeD2Q9.drawDensityTable(minDensity: Double, maxDensity: Double): Unit {
     for (i in cells.indices) {
         for (j in cells[0].indices) {
-            drawScalarValue(cells[i][j].computeRho(cells[i][j].f), i, j, LX, LY, minDensity, maxDensity)
+            drawScalarValue(cells[i][j].computeRho(cells[i][j].f), i, j, minDensity, maxDensity)
         }
     }
 }
 
-// TODO: fix for non-square lattice
 fun LatticeD2Q9.drawVelocityNormTable(minVelocityNorm: Double, maxVelocityNorm: Double): Unit {
     for (i in cells.indices) {
         for (j in cells[0].indices) {
             drawScalarValue(
                     norm(cells[i][j].computeRhoU(cells[i][j].f)),
-                    i, j, LX, LY, minVelocityNorm, maxVelocityNorm
+                    i, j, minVelocityNorm, maxVelocityNorm
+            )
+        }
+    }
+}
+
+fun LatticeD2Q9.drawVelocityVectorTable(minVelocityNorm: Double, maxVelocityNorm: Double): Unit {
+    for (i in cells.indices) {
+        for (j in cells[0].indices) {
+            drawVectorValue(
+                    cells[i][j].computeRhoU(cells[i][j].f),
+                    i, j, minVelocityNorm, maxVelocityNorm
             )
         }
     }
