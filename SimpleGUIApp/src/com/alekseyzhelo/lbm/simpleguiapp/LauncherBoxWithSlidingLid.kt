@@ -25,7 +25,7 @@ fun main(args: Array<String>) {
             BoundaryType.SLIDING, // top
             BoundaryType.NO_SLIP, // right
             BoundaryType.NO_SLIP, // bottom
-            tParam = 0.1,
+            tParam = 0.01,
             bParam = 0.001
     )
     val force = 0.00001
