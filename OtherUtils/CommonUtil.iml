@@ -8,8 +8,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
-    <orderEntry type="module" module-name="CLISettings" />
     <orderEntry type="module" module-name="LBM" />
-    <orderEntry type="module" module-name="CommonUtil" />
+    <orderEntry type="module" module-name="CLISettings" />
   </component>
 </module>

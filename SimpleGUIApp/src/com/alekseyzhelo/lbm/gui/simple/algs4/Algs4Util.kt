@@ -1,4 +1,4 @@
-package com.alekseyzhelo.lbm.simpleguiapp.algs4
+package com.alekseyzhelo.lbm.gui.simple.algs4
 
 import com.alekseyzhelo.lbm.core.lattice.LatticeD2Q9
 import com.alekseyzhelo.lbm.util.norm

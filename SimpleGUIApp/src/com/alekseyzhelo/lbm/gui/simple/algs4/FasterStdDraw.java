@@ -1,4 +1,4 @@
-package com.alekseyzhelo.lbm.simpleguiapp.algs4;
+package com.alekseyzhelo.lbm.gui.simple.algs4;
 
 /******************************************************************************
  * Compilation:  javac StdDraw.java

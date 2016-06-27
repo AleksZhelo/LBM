@@ -1,11 +1,6 @@
 package com.alekseyzhelo.lbm.testapp
 
-import com.alekseyzhelo.lbm.boundary.BoundaryPosition
-import com.alekseyzhelo.lbm.boundary.BoundaryType
-import com.alekseyzhelo.lbm.cli.CLISettings
 import com.alekseyzhelo.lbm.cli.collectArguments
-import com.alekseyzhelo.lbm.core.lattice.LatticeD2Q9
-import com.alekseyzhelo.lbm.dynamics.BGKDynamicsD2Q9
 import com.alekseyzhelo.lbm.functions.pressureWaveRho
 import com.alekseyzhelo.lbm.testapp.curses.blue
 import com.alekseyzhelo.lbm.testapp.curses.drawPressureRatedTable
@@ -61,15 +56,3 @@ fun main(args: Array<String>) {
 }
 
 
-private fun setupLattice(cli: CLISettings): LatticeD2Q9 {
-    val boundaries = mapOf(
-            Pair(BoundaryPosition.LEFT, BoundaryType.PERIODIC),
-            Pair(BoundaryPosition.TOP, BoundaryType.PERIODIC),
-            Pair(BoundaryPosition.RIGHT, BoundaryType.PERIODIC),
-            Pair(BoundaryPosition.BOTTOM, BoundaryType.PERIODIC)
-    )
-    val lattice = LatticeD2Q9(cli.lx, cli.ly, BGKDynamicsD2Q9(cli.omega), boundaries)
-    print(lattice)
-
-    return lattice
-}

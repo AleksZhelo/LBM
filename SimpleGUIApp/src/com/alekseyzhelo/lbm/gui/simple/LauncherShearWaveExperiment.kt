@@ -1,12 +1,10 @@
-package com.alekseyzhelo.lbm.simpleguiapp
+package com.alekseyzhelo.lbm.gui.simple
 
 import com.alekseyzhelo.lbm.cli.collectArguments
 import com.alekseyzhelo.lbm.functions.shearWaveMaxVelocityY
 import com.alekseyzhelo.lbm.functions.shearWaveVelocity
-import com.alekseyzhelo.lbm.simpleguiapp.util.*
+import com.alekseyzhelo.lbm.gui.simple.util.*
 import com.alekseyzhelo.lbm.util.*
-import sampleAverageXSpeed
-import sampleXSpeed
 import java.text.SimpleDateFormat
 import java.util.*
 

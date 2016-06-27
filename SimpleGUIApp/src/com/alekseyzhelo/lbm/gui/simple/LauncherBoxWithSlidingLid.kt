@@ -1,15 +1,9 @@
-package com.alekseyzhelo.lbm.simpleguiapp
+package com.alekseyzhelo.lbm.gui.simple
 
 import com.alekseyzhelo.lbm.boundary.BoundaryType
 import com.alekseyzhelo.lbm.cli.collectArguments
-import com.alekseyzhelo.lbm.simpleguiapp.util.createBoundaries
-import com.alekseyzhelo.lbm.simpleguiapp.util.initGraphicsWindow
-import com.alekseyzhelo.lbm.simpleguiapp.util.setupLattice
-import com.alekseyzhelo.lbm.simpleguiapp.util.setupVisualizer
-import com.alekseyzhelo.lbm.util.maxDensity
-import com.alekseyzhelo.lbm.util.maxVelocityNorm
-import com.alekseyzhelo.lbm.util.minDensity
-import sampleXSpeedAveragedByX
+import com.alekseyzhelo.lbm.gui.simple.util.*
+import com.alekseyzhelo.lbm.util.*
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -40,9 +34,9 @@ fun main(args: Array<String>) {
     println("Max velocity norm: ${lattice.maxVelocityNorm()}")
 
     val printLine = { x: Any -> if (cli.verbose) println(x) }
-    val visualize = setupVisualizer(cli, lattice)
+    val visualize = com.alekseyzhelo.lbm.gui.simple.util.setupVisualizer(cli, lattice)
 
-    initGraphicsWindow(cli)
+    com.alekseyzhelo.lbm.gui.simple.util.initGraphicsWindow(cli)
 
     visualize()
     printLine("Total density: ${lattice.totalDensity()}")

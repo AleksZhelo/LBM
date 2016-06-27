@@ -1,3 +1,5 @@
+package com.alekseyzhelo.lbm.util
+
 import com.alekseyzhelo.lbm.core.lattice.LatticeD2Q9
 import java.util.*
 

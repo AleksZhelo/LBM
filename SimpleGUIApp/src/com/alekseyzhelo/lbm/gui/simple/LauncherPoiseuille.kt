@@ -1,4 +1,4 @@
-package com.alekseyzhelo.lbm.simpleguiapp
+package com.alekseyzhelo.lbm.gui.simple
 
 import com.alekseyzhelo.lbm.boundary.BoundaryPosition
 import com.alekseyzhelo.lbm.boundary.BoundaryType
@@ -7,9 +7,8 @@ import com.alekseyzhelo.lbm.dynamics.ConstantXForce_BGK_D2Q9
 import com.alekseyzhelo.lbm.functions.columnPressureWaveRho
 import com.alekseyzhelo.lbm.functions.multiplePressureWaveRho
 import com.alekseyzhelo.lbm.functions.shearWaveVelocity
-import com.alekseyzhelo.lbm.simpleguiapp.util.*
+import com.alekseyzhelo.lbm.gui.simple.util.*
 import com.alekseyzhelo.lbm.util.*
-import sampleXSpeedAveragedByX
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
