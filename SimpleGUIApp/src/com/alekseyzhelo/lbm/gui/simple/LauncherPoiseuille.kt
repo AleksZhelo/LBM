@@ -9,6 +9,10 @@ import com.alekseyzhelo.lbm.functions.multiplePressureWaveRho
 import com.alekseyzhelo.lbm.functions.shearWaveVelocity
 import com.alekseyzhelo.lbm.gui.simple.util.*
 import com.alekseyzhelo.lbm.util.*
+import com.alekseyzhelo.lbm.util.lattice.createBoundaries
+import com.alekseyzhelo.lbm.util.lattice.setupLattice
+import com.alekseyzhelo.lbm.util.sampling.sampleXSpeedAveragedByX
+import com.alekseyzhelo.lbm.util.timing.printExecutionTime
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -94,12 +98,8 @@ fun main(args: Array<String>) {
     //ySamples.toDoubleArrayFile("Poiseuille_force_${force}_${cli.lx}x${cli.ly}_${cli.omega}_omega_${cli.time}_iterations_${dateFormat.format(Date())}.txt")
     val end = System.currentTimeMillis()
 
-    val formatter = DecimalFormat("#0.00000");
-    println("Execution time: ${formatter.format((end - start) / 1000.0)} seconds");
+    printExecutionTime(end, start)
     println("Executed $time LBM steps.")
-
     printLine("Total density: ${lattice.totalDensity()}")
-
-
 }
 

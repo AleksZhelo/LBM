@@ -6,6 +6,7 @@ import com.alekseyzhelo.lbm.testapp.curses.blue
 import com.alekseyzhelo.lbm.testapp.curses.drawPressureRatedTable
 import com.alekseyzhelo.lbm.testapp.curses.drawVelocityRatedTable
 import com.alekseyzhelo.lbm.util.*
+import com.alekseyzhelo.lbm.util.lattice.setupLattice
 import jcurses.system.Toolkit
 
 /**

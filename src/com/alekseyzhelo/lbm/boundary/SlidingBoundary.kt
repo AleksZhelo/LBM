@@ -18,6 +18,7 @@ class SlidingBoundary(val position: BoundaryPosition, lattice: LatticeD2Q9,
     override fun boundaryStream() {
         when (position) {
             BoundaryPosition.TOP -> {
+                //var once = true
                 for (i in x0..x1) {
                     val iPlus = i + 1
                     val iSub = i - 1
@@ -26,6 +27,10 @@ class SlidingBoundary(val position: BoundaryPosition, lattice: LatticeD2Q9,
 
                         val q = slideVelocity / (2.0 * cells[i][j].computeRhoU(cells[i][j].f)[0])
                         val p = 1.0 - q
+//                        if(once){
+//                            println("p: $p, q: $q, slideVel: $slideVelocity")
+//                            once = false
+//                        }
 
                         cells[i][j].fBuf[0] = cells[i][j].f[0];
                         cells[iPlus][j].fBuf[1] = cells[i][j].f[1];

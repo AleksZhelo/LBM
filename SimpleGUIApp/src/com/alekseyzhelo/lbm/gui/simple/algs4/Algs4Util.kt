@@ -58,6 +58,7 @@ internal fun drawVectorValue(value: DoubleArray, i: Int, j: Int,
     FasterStdDraw.drawArrowLineTest((i).toDouble(), (j).toDouble(), i + ort[0], j + ort[1], 0.3, 0.2);
 }
 
+// TODO: how bad is this from an object-oriented design perspective?
 fun LatticeD2Q9.drawDensityTable(minDensity: Double, maxDensity: Double): Unit {
     for (i in cells.indices) {
         for (j in cells[0].indices) {

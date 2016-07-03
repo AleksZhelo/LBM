@@ -2,6 +2,7 @@ package com.alekseyzhelo.lbm.core.cell
 
 import com.alekseyzhelo.lbm.core.lattice.DescriptorD2Q9
 import com.alekseyzhelo.lbm.core.lattice.DescriptorD2Q9.Q
+import com.alekseyzhelo.lbm.core.statistics.LatticeStatistics
 
 /**
  * @author Aleks on 18-05-2016.
@@ -18,7 +19,7 @@ class CellD2Q9 {
     var fBuf = DoubleArray(Q)
         private set
 
-    private val U = DoubleArray(DescriptorD2Q9.D) // TODO: this takes too much memory?
+     val U = DoubleArray(DescriptorD2Q9.D) // TODO: this takes too much memory?
 
     operator fun get(index: Int): Double {
         return f[index]
@@ -49,6 +50,7 @@ class CellD2Q9 {
         }
         U[0] = (F[1] + F[5] + F[8] - F[3] - F[6] - F[7]) / Rho
         U[1] = (F[2] + F[5] + F[6] - F[4] - F[7] - F[8]) / Rho
+        LatticeStatistics.gatherMaxVel(U)
         return U
     }
 
@@ -61,6 +63,7 @@ class CellD2Q9 {
         }
         U[0] = (F[1] + F[5] + F[8] - F[3] - F[6] - F[7]) / Rho
         U[1] = (F[2] + F[5] + F[6] - F[4] - F[7] - F[8]) / Rho
+        LatticeStatistics.gatherMaxVel(U)
         return U
     }
 

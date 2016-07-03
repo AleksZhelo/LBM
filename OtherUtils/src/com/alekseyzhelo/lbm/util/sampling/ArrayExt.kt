@@ -1,4 +1,4 @@
-package com.alekseyzhelo.lbm.util
+package com.alekseyzhelo.lbm.util.sampling
 
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -10,6 +10,18 @@ import java.util.*
 
 // TODO: fix JVM signature and use the same name
 fun ArrayList<DoubleArray>.toDoubleArrayFile(filename: String) {
+    val path = Paths.get(filename)
+    Files.newOutputStream(path).bufferedWriter().use {
+        for (a in this) {
+            for (d in a) {
+                it.write("$d ")
+            }
+            it.newLine()
+        }
+    }
+}
+
+fun Array<DoubleArray>.toDoubleArrFile(filename: String) {
     val path = Paths.get(filename)
     Files.newOutputStream(path).bufferedWriter().use {
         for (a in this) {

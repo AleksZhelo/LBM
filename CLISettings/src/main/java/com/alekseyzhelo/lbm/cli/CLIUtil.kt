@@ -7,10 +7,10 @@ import com.beust.jcommander.ParameterException
  * @author Aleks on 29-05-2016.
  */
 fun collectArguments(programName: String, args: Array<String>): CLISettings {
-    val cli = CLISettings();
+    val cli = CLISettings()
 
-    val commander = JCommander(cli);
-    commander.setProgramName(programName);
+    val commander = JCommander(cli)
+    commander.setProgramName(programName)
 
     try {
         commander.parse(*args)
@@ -22,5 +22,20 @@ fun collectArguments(programName: String, args: Array<String>): CLISettings {
         System.exit(1)
     } finally {
         return cli
+    }
+}
+
+fun collectArguments(programName: String, parameters: Array<Any>, args: Array<String>) {
+    val commander = JCommander(parameters)
+    commander.setProgramName(programName)
+
+    try {
+        commander.parse(*args)
+    } catch (e: ParameterException) {
+        val builder = StringBuilder()
+        builder.appendln(e.message)
+        commander.usage(builder)
+        print(builder.toString())
+        System.exit(1)
     }
 }

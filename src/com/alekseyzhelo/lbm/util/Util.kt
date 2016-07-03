@@ -13,27 +13,27 @@ inline fun normalize(value: Double, minValue: Double, maxValue: Double): Double 
 }
 
 fun norm(U: DoubleArray): Double {
-    var norm = 0.0;
+    var norm = 0.0
     for (i in U.indices) {
-        norm += U[i] * U[i];
+        norm += U[i] * U[i]
     }
-    return Math.sqrt(norm);
+    return Math.sqrt(norm)
 }
 
 fun normSquare(U: DoubleArray): Double {
-    var uSqr = 0.0;
+    var uSqr = 0.0
     for (i in U.indices) {
-        uSqr += U[i] * U[i];
+        uSqr += U[i] * U[i]
     }
-    return uSqr;
+    return uSqr
 }
 
 fun scalarProduct(U: DoubleArray, V: DoubleArray): Double {
-    var prod = 0.0;
+    var prod = 0.0
     for (i in U.indices) {
-        prod += U[i] * V[i];
+        prod += U[i] * V[i]
     }
-    return prod;
+    return prod
 }
 
 fun normalize(U: DoubleArray): DoubleArray {

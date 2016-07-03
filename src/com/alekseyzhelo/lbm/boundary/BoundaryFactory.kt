@@ -14,6 +14,7 @@ object D2BoundaryFactory {
             BoundaryType.PERIODIC -> PeriodicBoundary(lattice, x0, x1, y0, y1)
             BoundaryType.NO_SLIP -> NoSlipBoundary(position, lattice, x0, x1, y0, y1)
             BoundaryType.SLIDING -> SlidingBoundary(position, lattice, x0, x1, y0, y1, wallVelocity!!)
+            BoundaryType.ZHOU_HE_UX -> ZhouHeUXBoundary(position, lattice, x0, x1, y0, y1, wallVelocity!!)
         }
     }
 

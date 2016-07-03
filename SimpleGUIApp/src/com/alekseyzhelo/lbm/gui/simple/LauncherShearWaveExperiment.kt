@@ -3,8 +3,14 @@ package com.alekseyzhelo.lbm.gui.simple
 import com.alekseyzhelo.lbm.cli.collectArguments
 import com.alekseyzhelo.lbm.functions.shearWaveMaxVelocityY
 import com.alekseyzhelo.lbm.functions.shearWaveVelocity
-import com.alekseyzhelo.lbm.gui.simple.util.*
+import com.alekseyzhelo.lbm.gui.simple.util.initGraphicsWindow
+import com.alekseyzhelo.lbm.gui.simple.util.setupVisualizer
 import com.alekseyzhelo.lbm.util.*
+import com.alekseyzhelo.lbm.util.lattice.setupLattice
+import com.alekseyzhelo.lbm.util.sampling.sampleAverageXSpeed
+import com.alekseyzhelo.lbm.util.sampling.sampleXSpeed
+import com.alekseyzhelo.lbm.util.sampling.toDoubleArrayFile
+import com.alekseyzhelo.lbm.util.sampling.toFile
 import java.text.SimpleDateFormat
 import java.util.*
 

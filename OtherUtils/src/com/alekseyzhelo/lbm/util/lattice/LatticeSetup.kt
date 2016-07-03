@@ -1,4 +1,4 @@
-package com.alekseyzhelo.lbm.util
+package com.alekseyzhelo.lbm.util.lattice
 
 import com.alekseyzhelo.lbm.boundary.BoundaryPosition
 import com.alekseyzhelo.lbm.boundary.BoundaryType

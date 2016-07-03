@@ -10,7 +10,7 @@ enum class BoundaryPosition {
 }
 
 enum class BoundaryType {
-    PERIODIC, NO_SLIP, SLIDING
+    PERIODIC, NO_SLIP, SLIDING, ZHOU_HE_UX
 }
 
 // TODO: handle corners automatically!

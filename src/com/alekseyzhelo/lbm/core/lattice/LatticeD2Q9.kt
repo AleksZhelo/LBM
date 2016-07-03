@@ -114,9 +114,30 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
     }
 
     fun iniEquilibrium(Rho: Double, U: DoubleArray): Unit { // constant U for the whole lattice
-        for (i in cells.indices) {
-            for (j in cells[i].indices) { // TODO performance?
+        for (i in 0..LX - 1) {
+            for (j in 1..LY - 2) { // TODO performance?
                 dynamics.iniEquilibrium(cells[i][j], Rho, U)
+            }
+        }
+        // TODO: all below - necessary?
+        if (topBoundary.getType() == BoundaryType.SLIDING || topBoundary.getType() == BoundaryType.ZHOU_HE_UX) {
+            val UU = doubleArrayOf(topBoundary.getParam()!!, 0.0)
+            for (i in 0..LX - 1) {
+                dynamics.iniEquilibrium(cells[i][LY-1], Rho, UU)
+            }
+        } else {
+            for (i in 0..LX - 1) {
+                dynamics.iniEquilibrium(cells[i][LY-1], Rho, U)
+            }
+        }
+        if (bottomBoundary.getType() == BoundaryType.SLIDING || bottomBoundary.getType() == BoundaryType.ZHOU_HE_UX) {
+            val UU = doubleArrayOf(bottomBoundary.getParam()!!, 0.0)
+            for (i in 0..LX - 1) {
+                dynamics.iniEquilibrium(cells[i][0], Rho, UU)
+            }
+        } else {
+            for (i in 0..LX - 1) {
+                dynamics.iniEquilibrium(cells[i][0], Rho, U)
             }
         }
     }
@@ -189,7 +210,7 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
         cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
         cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
 
-        when (leftBoundary.getType()){
+        when (leftBoundary.getType()) {
             BoundaryType.PERIODIC -> {
                 cells[iSub][j].fBuf[3] = cells[i][j].f[3];
                 cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
@@ -200,7 +221,7 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
             }
         }
 
-        when (bottomBoundary.getType()){
+        when (bottomBoundary.getType()) {
             BoundaryType.PERIODIC -> {
                 cells[i][jSub].fBuf[4] = cells[i][j].f[4];
                 cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
@@ -218,6 +239,14 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
                 cells[i][j].fBuf[2] = cells[i][j].f[4];
                 cells[i][j].fBuf[5] = p * cells[i][j].f[7] + q * cells[i][j].f[8];
                 cells[i][j].fBuf[6] = q * cells[i][j].f[7] + p * cells[i][j].f[8];
+            }
+            BoundaryType.ZHOU_HE_UX -> {
+                val rho = cells[i][j].f[0] + cells[i][j].f[1] + cells[i][j].f[3] +
+                        + 2.0 * (cells[i][j].f[4] + cells[i][j].f[7] + cells[i][j].f[8])
+
+                cells[i][j].fBuf[2] = cells[i][j].f[4];
+                cells[i][j].fBuf[5] = cells[i][j].f[7] - 0.5 * (cells[i][j].f[1] - cells[i][j].f[3]) + 0.5 * rho * bottomBoundary.getParam()!!;
+                cells[i][j].fBuf[6] = cells[i][j].f[8] + 0.5 * (cells[i][j].f[1] - cells[i][j].f[3]) - 0.5 * rho * bottomBoundary.getParam()!!;
             }
         }
 
@@ -234,7 +263,7 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
         cells[iSub][j].fBuf[3] = cells[i][j].f[3];
         cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
 
-        when (rightBoundary.getType()){
+        when (rightBoundary.getType()) {
             BoundaryType.PERIODIC -> {
                 cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
                 cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
@@ -245,7 +274,7 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
             }
         }
 
-        when (bottomBoundary.getType()){
+        when (bottomBoundary.getType()) {
             BoundaryType.PERIODIC -> {
                 cells[i][jSub].fBuf[4] = cells[i][j].f[4];
                 cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
@@ -264,6 +293,14 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
                 cells[i][j].fBuf[5] = p * cells[i][j].f[7] + q * cells[i][j].f[8];
                 cells[i][j].fBuf[6] = q * cells[i][j].f[7] + p * cells[i][j].f[8];
             }
+            BoundaryType.ZHOU_HE_UX -> {
+                val rho = cells[i][j].f[0] + cells[i][j].f[1] + cells[i][j].f[3] +
+                        + 2.0 * (cells[i][j].f[4] + cells[i][j].f[7] + cells[i][j].f[8])
+
+                cells[i][j].fBuf[2] = cells[i][j].f[4];
+                cells[i][j].fBuf[5] = cells[i][j].f[7] - 0.5 * (cells[i][j].f[1] - cells[i][j].f[3]) + 0.5 * rho * bottomBoundary.getParam()!!;
+                cells[i][j].fBuf[6] = cells[i][j].f[8] + 0.5 * (cells[i][j].f[1] - cells[i][j].f[3]) - 0.5 * rho * bottomBoundary.getParam()!!;
+            }
         }
 
         // left top
@@ -279,7 +316,7 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
         cells[i][jSub].fBuf[4] = cells[i][j].f[4];
         cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
 
-        when (leftBoundary.getType()){
+        when (leftBoundary.getType()) {
             BoundaryType.PERIODIC -> {
                 cells[iSub][j].fBuf[3] = cells[i][j].f[3];
                 cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
@@ -290,7 +327,7 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
             }
         }
 
-        when (topBoundary.getType()){
+        when (topBoundary.getType()) {
             BoundaryType.PERIODIC -> {
                 cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
                 cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
@@ -324,7 +361,7 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
         cells[i][jSub].fBuf[4] = cells[i][j].f[4];
         cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
 
-        when (topBoundary.getType()){
+        when (topBoundary.getType()) {
             BoundaryType.PERIODIC -> {
                 cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
                 cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
@@ -345,7 +382,7 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
             }
         }
 
-        when (rightBoundary.getType()){
+        when (rightBoundary.getType()) {
             BoundaryType.PERIODIC -> {
                 cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
                 cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
@@ -358,7 +395,7 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
     }
 
     private fun automaticCornersWrongBeautiful() {
-    // left bottom
+        // left bottom
         var i = 0
         var j = 0
         var iPlus = i + 1
@@ -371,7 +408,7 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
         cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
         cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
 
-        when (leftBoundary.getType()){
+        when (leftBoundary.getType()) {
             BoundaryType.PERIODIC -> {
                 cells[iSub][j].fBuf[3] = cells[i][j].f[3];
                 cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
@@ -382,7 +419,7 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
             }
         }
 
-        when (bottomBoundary.getType()){
+        when (bottomBoundary.getType()) {
             BoundaryType.PERIODIC -> {
                 cells[i][jSub].fBuf[4] = cells[i][j].f[4];
                 cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
@@ -408,7 +445,7 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
         cells[iSub][j].fBuf[3] = cells[i][j].f[3];
         cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
 
-        when (rightBoundary.getType()){
+        when (rightBoundary.getType()) {
             BoundaryType.PERIODIC -> {
                 cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
                 cells[iPlus][jSub].fBuf[5] = cells[i][j].f[5];
@@ -419,7 +456,7 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
             }
         }
 
-        when (bottomBoundary.getType()){
+        when (bottomBoundary.getType()) {
             BoundaryType.PERIODIC -> {
                 cells[i][jSub].fBuf[4] = cells[i][j].f[4];
                 cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
@@ -445,7 +482,7 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
         cells[i][jSub].fBuf[4] = cells[i][j].f[4];
         cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
 
-        when (leftBoundary.getType()){
+        when (leftBoundary.getType()) {
             BoundaryType.PERIODIC -> {
                 cells[iSub][j].fBuf[3] = cells[i][j].f[3];
                 cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
@@ -456,7 +493,7 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
             }
         }
 
-        when (topBoundary.getType()){
+        when (topBoundary.getType()) {
             BoundaryType.PERIODIC -> {
                 cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
                 cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
@@ -482,7 +519,7 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
         cells[i][jSub].fBuf[4] = cells[i][j].f[4];
         cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
 
-        when (topBoundary.getType()){
+        when (topBoundary.getType()) {
             BoundaryType.PERIODIC -> {
                 cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
                 cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
@@ -495,7 +532,7 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
             }
         }
 
-        when (rightBoundary.getType()){
+        when (rightBoundary.getType()) {
             BoundaryType.PERIODIC -> {
                 cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
                 cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];

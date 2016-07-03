@@ -1,4 +1,4 @@
-package com.alekseyzhelo.lbm.util
+package com.alekseyzhelo.lbm.util.sampling
 
 import com.alekseyzhelo.lbm.core.lattice.LatticeD2Q9
 import java.util.*
@@ -40,4 +40,20 @@ fun sampleXSpeedAveragedByX(lattice: LatticeD2Q9): DoubleArray {
     }
 
     return speed
+}
+
+fun sampleVectorField(lattice: LatticeD2Q9): Array<DoubleArray> {
+    val vectorField = Array(lattice.LX * lattice.LY, { x -> DoubleArray(4) })
+    var k = 0
+    for (x in lattice.cells.indices) {
+        for (y in lattice.cells[x].indices) {
+            val U = lattice.cells[x][y].computeRhoU(lattice.cells[x][y].f)
+            vectorField[k][0] = x.toDouble()
+            vectorField[k][1] = y.toDouble()
+            vectorField[k][2] = U[0]
+            vectorField[k++][3] = U[1]
+        }
+    }
+
+    return vectorField
 }
