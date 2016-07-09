@@ -42,7 +42,7 @@ fun setupLattice(cli: CLISettings, boundaries: Map<BoundaryPosition, Pair<Bounda
 }
 
 fun setupLattice(cli: CLISettings, dynamics: Dynamics2DQ9, boundaries: Map<BoundaryPosition, Pair<BoundaryType, Double?>>): LatticeD2Q9 {
-    val lattice = LatticeD2Q9(cli.lx, cli.ly, dynamics, boundaries)
+    val lattice = LatticeD2Q9(cli.lx, cli.ly, cli.omega, dynamics, boundaries)
     print(lattice)
 
     return lattice

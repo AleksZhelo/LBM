@@ -120,6 +120,7 @@ object BulkMomenta : Momenta {
 
 }
 
+// TODO: does not work :(
 class BoundaryMomenta(val position: BoundaryPosition) : Momenta {
 
     /**
@@ -129,7 +130,7 @@ class BoundaryMomenta(val position: BoundaryPosition) : Momenta {
 
     override fun computeRho(cell: CellD2Q9): Double {
         var rho = 0.0
-        for (f in position.outgoing) {
+        for (f in position.inside) {
             rho += cell[f]
         }
         return rho
@@ -141,7 +142,7 @@ class BoundaryMomenta(val position: BoundaryPosition) : Momenta {
         if (rho == 0.0) { // TODO clutch, find a way to remove
             return cell.U
         }
-        for (f in position.outgoing) {
+        for (f in position.inside) {
             cell.U[0] += cell[f] * DescriptorD2Q9.c[f][0]
             cell.U[1] += cell[f] * DescriptorD2Q9.c[f][1]
         }
@@ -153,7 +154,7 @@ class BoundaryMomenta(val position: BoundaryPosition) : Momenta {
 
     override fun computeRhoU(cell: CellD2Q9): DoubleArray {
         var rho = 0.0
-        for (f in position.outgoing) {
+        for (f in position.inside) {
             rho += cell[f]
         }
 
@@ -162,7 +163,7 @@ class BoundaryMomenta(val position: BoundaryPosition) : Momenta {
         if (rho == 0.0) { // TODO clutch, find a way to remove
             return cell.U
         }
-        for (f in position.outgoing) {
+        for (f in position.inside) {
             cell.U[0] += cell[f] * DescriptorD2Q9.c[f][0]
             cell.U[1] += cell[f] * DescriptorD2Q9.c[f][1]
         }
@@ -174,7 +175,7 @@ class BoundaryMomenta(val position: BoundaryPosition) : Momenta {
 
     override fun computeBufferRho(cell: CellD2Q9): Double {
         var rho = 0.0
-        for (f in position.outgoing) {
+        for (f in position.inside) {
             rho += cell.fBuf[f]
         }
         return rho
@@ -186,7 +187,7 @@ class BoundaryMomenta(val position: BoundaryPosition) : Momenta {
         if (rho == 0.0) { // TODO clutch, find a way to remove
             return cell.U
         }
-        for (f in position.outgoing) {
+        for (f in position.inside) {
             cell.U[0] += cell.fBuf[f] * DescriptorD2Q9.c[f][0]
             cell.U[1] += cell.fBuf[f] * DescriptorD2Q9.c[f][1]
         }
@@ -198,7 +199,7 @@ class BoundaryMomenta(val position: BoundaryPosition) : Momenta {
 
     override fun computeBufferRhoU(cell: CellD2Q9): DoubleArray {
         var rho = 0.0
-        for (f in position.outgoing) {
+        for (f in position.inside) {
             rho += cell.fBuf[f]
         }
 
@@ -207,7 +208,7 @@ class BoundaryMomenta(val position: BoundaryPosition) : Momenta {
         if (rho == 0.0) { // TODO clutch, find a way to remove
             return cell.U
         }
-        for (f in position.outgoing) {
+        for (f in position.inside) {
             cell.U[0] += cell.fBuf[f] * DescriptorD2Q9.c[f][0]
             cell.U[1] += cell.fBuf[f] * DescriptorD2Q9.c[f][1]
         }

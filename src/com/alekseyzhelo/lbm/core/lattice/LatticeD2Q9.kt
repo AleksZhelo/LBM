@@ -5,6 +5,7 @@ import com.alekseyzhelo.lbm.boundary.BoundaryPosition
 import com.alekseyzhelo.lbm.boundary.BoundaryType
 import com.alekseyzhelo.lbm.boundary.D2BoundaryFactory
 import com.alekseyzhelo.lbm.core.cell.CellD2Q9
+import com.alekseyzhelo.lbm.dynamics.BoundaryBGK_D2Q9
 import com.alekseyzhelo.lbm.dynamics.Dynamics2DQ9
 import java.util.stream.IntStream
 
@@ -15,13 +16,24 @@ import java.util.stream.IntStream
 // TODO: units
 // TODO?: boundary conditions
 // TODO?: solids, etc
-class LatticeD2Q9(val LX: Int, val LY: Int, dynamics: Dynamics2DQ9, boundaries: Map<BoundaryPosition, Pair<BoundaryType, Double?>>) {
+class LatticeD2Q9(val LX: Int, val LY: Int, omega: Double, dynamics: Dynamics2DQ9, boundaries: Map<BoundaryPosition, Pair<BoundaryType, Double?>>) {
 
-    // TODO: BLOCKER proper dynamics on boundaries
+    // TODO: SOFT-BLOCKER figure out proper dynamics on boundaries
     val cells = Array(LX, { x ->
         Array(LY, {
             y ->
-            CellD2Q9(dynamics)
+            {
+//                val tParams = boundaries[BoundaryPosition.TOP]!!
+//                val mDynamics = if (y == LY - 1 && (x > 0 || x < LX - 1)) {
+//                    if (tParams.first == BoundaryType.SLIDING)
+//                        BoundaryBGK_D2Q9(omega, BoundaryPosition.TOP)
+//                    else
+//                        dynamics
+//                } else
+//                    dynamics
+                val mDynamics = dynamics
+                CellD2Q9(mDynamics)
+            }()
         })
     })
 
