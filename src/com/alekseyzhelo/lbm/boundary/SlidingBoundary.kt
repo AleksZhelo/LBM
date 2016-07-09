@@ -8,6 +8,21 @@ class SlidingBoundary(val position: BoundaryPosition, lattice: LatticeD2Q9,
 
     val cells = lattice.cells
 
+    override fun defineBoundaryRhoU(rho: Double, U: DoubleArray) {
+        val slideU = when(position) {
+            BoundaryPosition.LEFT -> doubleArrayOf(0.0, slideVelocity)
+            BoundaryPosition.TOP -> doubleArrayOf(slideVelocity, 0.0)
+            BoundaryPosition.RIGHT -> doubleArrayOf(0.0, slideVelocity)
+            BoundaryPosition.BOTTOM -> doubleArrayOf(slideVelocity, 0.0)
+        }
+
+        for (i in x0..x1) {
+            for (j in y0..y1) {
+                lattice.cells[i][j].defineRhoU(rho, slideU)
+            }
+        }
+    }
+
     override fun getType(): BoundaryType {
         return BoundaryType.SLIDING
     }

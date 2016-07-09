@@ -3,6 +3,8 @@ package com.alekseyzhelo.lbm.gui.lwjgl
 import com.alekseyzhelo.lbm.boundary.BoundaryType
 import com.alekseyzhelo.lbm.cli.CLISettings
 import com.alekseyzhelo.lbm.cli.collectArguments
+import com.alekseyzhelo.lbm.functions.multiplePressureWaveRho
+import com.alekseyzhelo.lbm.functions.rowPressureWaveRho
 import com.alekseyzhelo.lbm.statistics.LatticeStatistics
 import com.alekseyzhelo.lbm.gui.lwjgl.cli.CMSettings
 import com.alekseyzhelo.lbm.gui.lwjgl.render.GL11Renderer

@@ -7,7 +7,7 @@ import com.alekseyzhelo.lbm.dynamics.Dynamics2DQ9
 /**
  * @author Aleks on 18-05-2016.
  */
-// TODO: add 1 to Rho for improved numerical stability? What are the other modifications to make that work properly?
+// TODO: add 1 to rho for improved numerical stability? What are the other modifications to make that work properly?
 class CellD2Q9(val dynamics: Dynamics2DQ9) {
 
     // NB: Streaming is possible with a single cells array
@@ -29,17 +29,19 @@ class CellD2Q9(val dynamics: Dynamics2DQ9) {
         f[index] = value
     }
 
+    fun collide() = dynamics.collide(this)
+
     fun computeRho() = dynamics.computeRho(this)
-
     fun computeU(rho: Double) = dynamics.computeU(this, rho)
-
     fun computeRhoU() = dynamics.computeRhoU(this)
 
     fun computeBufferRho() = dynamics.computeBufferRho(this)
-
     fun computeBufferU(rho: Double) = dynamics.computeBufferU(this, rho)
-
     fun computeBufferRhoU() = dynamics.computeBufferRhoU(this)
+
+    fun defineRho(rho: Double) = dynamics.defineRho(this, rho)
+    fun defineU(U: DoubleArray) = dynamics.defineU(this, U)
+    fun defineRhoU(rho: Double, U: DoubleArray) = dynamics.defineRhoU(this, rho, U)
 
     override fun toString(): String {
         val rho = computeRho()

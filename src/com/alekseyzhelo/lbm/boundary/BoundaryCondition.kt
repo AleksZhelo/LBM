@@ -31,6 +31,14 @@ enum class BoundaryType {
 abstract class BoundaryCondition(protected val lattice: LatticeD2Q9,
                                  val x0: Int, val x1: Int, val y0: Int, val y1: Int) {
 
+    open fun defineBoundaryRhoU(rho: Double, U: DoubleArray) {
+        for (i in x0..x1) {
+            for (j in y0..y1) {
+                lattice.cells[i][j].defineRhoU(rho, U)
+            }
+        }
+    }
+
     abstract fun boundaryStream()
     abstract fun getType(): BoundaryType
     abstract fun getParam(): Double?

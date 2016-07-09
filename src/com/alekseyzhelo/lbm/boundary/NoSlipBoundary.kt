@@ -9,6 +9,15 @@ class NoSlipBoundary(val position: BoundaryPosition, lattice: LatticeD2Q9,
 
     val cells = lattice.cells
 
+    override fun defineBoundaryRhoU(rho: Double, U: DoubleArray) {
+        for (i in x0..x1) {
+            for (j in y0..y1) {
+                // TODO: right?
+                lattice.cells[i][j].defineRhoU(rho, doubleArrayOf(0.0, 0.0))
+            }
+        }
+    }
+
     override fun getType(): BoundaryType {
         return BoundaryType.NO_SLIP
     }

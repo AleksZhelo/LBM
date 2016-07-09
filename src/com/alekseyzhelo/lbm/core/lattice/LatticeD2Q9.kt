@@ -15,7 +15,7 @@ import java.util.stream.IntStream
 // TODO: units
 // TODO?: boundary conditions
 // TODO?: solids, etc
-class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundaries: Map<BoundaryPosition, Pair<BoundaryType, Double?>>) {
+class LatticeD2Q9(val LX: Int, val LY: Int, dynamics: Dynamics2DQ9, boundaries: Map<BoundaryPosition, Pair<BoundaryType, Double?>>) {
 
     // TODO: BLOCKER proper dynamics on boundaries
     val cells = Array(LX, { column -> Array(LY, { cell -> CellD2Q9(dynamics) }) })
@@ -86,7 +86,7 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
     fun bulkCollide(x0: Int, x1: Int, y0: Int, y1: Int): Unit {
         for (i in x0..x1) {
             for (j in y0..y1) { // TODO performance?
-                dynamics.collide(cells[i][j])
+                cells[i][j].collide()
             }
         }
     }
@@ -96,7 +96,7 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
                 .parallel()
                 .forEach { i ->
                     IntStream.range(y0, y1 + 1)
-                            .forEach { j -> dynamics.collide(cells[i][j]) }
+                            .forEach { j -> cells[i][j].collide() }
                 }
     }
 
@@ -113,55 +113,55 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
         //slipAndPeriodicCorners()
     }
 
-    fun iniEquilibrium(Rho: Double, U: DoubleArray): Unit { // constant U for the whole lattice
+    fun iniEquilibrium(rho: Double, U: DoubleArray): Unit { // constant U for the whole lattice
         for (i in 0..LX - 1) {
-            for (j in 1..LY - 2) { // TODO performance?
-                dynamics.iniEquilibrium(cells[i][j], Rho, U)
+            for (j in 1..LY - 2) {
+                cells[i][j].defineRhoU(rho, U)
             }
         }
 
         if (topBoundary.getType() == BoundaryType.SLIDING || topBoundary.getType() == BoundaryType.ZHOU_HE_UX) {
             val UU = doubleArrayOf(topBoundary.getParam()!!, 0.0)
             for (i in 0..LX - 1) {
-                dynamics.iniEquilibrium(cells[i][LY - 1], Rho, UU)
+                cells[i][LY - 1].defineRhoU(rho, UU)
             }
         } else {
             for (i in 0..LX - 1) {
-                dynamics.iniEquilibrium(cells[i][LY - 1], Rho, U)
+                cells[i][LY - 1].defineRhoU(rho, U)
             }
         }
         if (bottomBoundary.getType() == BoundaryType.SLIDING || bottomBoundary.getType() == BoundaryType.ZHOU_HE_UX) {
             val UU = doubleArrayOf(bottomBoundary.getParam()!!, 0.0)
             for (i in 0..LX - 1) {
-                dynamics.iniEquilibrium(cells[i][0], Rho, UU)
+                cells[i][0].defineRhoU(rho, UU)
             }
         } else {
             for (i in 0..LX - 1) {
-                dynamics.iniEquilibrium(cells[i][0], Rho, U)
+                cells[i][0].defineRhoU(rho, U)
             }
         }
     }
 
-    fun iniEquilibrium(Rho: Double, U: (i: Int, j: Int) -> DoubleArray): Unit { // U as a function of the cell's location
+    fun iniEquilibrium(rho: Double, U: (i: Int, j: Int) -> DoubleArray): Unit { // U as a function of the cell's location
         for (i in cells.indices) {
-            for (j in cells[i].indices) { // TODO performance?
-                dynamics.iniEquilibrium(cells[i][j], Rho, U(i, j))
+            for (j in cells[i].indices) {
+                cells[i][j].defineRhoU(rho, U(i, j))
             }
         }
     }
 
-    fun iniEquilibrium(Rho: (i: Int, j: Int) -> Double, U: DoubleArray): Unit { // Rho as a function of the cell's location
+    fun iniEquilibrium(rho: (i: Int, j: Int) -> Double, U: DoubleArray): Unit { // rho as a function of the cell's location
         for (i in cells.indices) {
-            for (j in cells[i].indices) { // TODO performance?
-                dynamics.iniEquilibrium(cells[i][j], Rho(i, j), U)
+            for (j in cells[i].indices) {
+                cells[i][j].defineRhoU(rho(i, j), U)
             }
         }
     }
 
-    fun iniEquilibrium(Rho: (i: Int, j: Int) -> Double, U: (i: Int, j: Int) -> DoubleArray): Unit { // Rho and U as functions of the cell's location
+    fun iniEquilibrium(rho: (i: Int, j: Int) -> Double, U: (i: Int, j: Int) -> DoubleArray): Unit { // rho and U as functions of the cell's location
         for (i in cells.indices) {
-            for (j in cells[i].indices) { // TODO performance?
-                dynamics.iniEquilibrium(cells[i][j], Rho(i, j), U(i, j))
+            for (j in cells[i].indices) {
+                cells[i][j].defineRhoU(rho(i, j), U(i, j))
             }
         }
     }
@@ -192,10 +192,10 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
     override fun toString(): String {
         return buildString {
             appendln("LX: $LX, LY: $LY")
-            appendln("Dynamics: $dynamics")
         }
     }
 
+    // TODO: improve further
     private fun automaticCorners() {
 // left bottom
         var i = 0

@@ -1,6 +1,7 @@
 package com.alekseyzhelo.lbm.boundary
 
 import com.alekseyzhelo.lbm.core.lattice.LatticeD2Q9
+import javax.naming.OperationNotSupportedException
 
 // TODO: does not work
 class ZhouHeUXBoundary(val position: BoundaryPosition, lattice: LatticeD2Q9,
@@ -8,6 +9,20 @@ class ZhouHeUXBoundary(val position: BoundaryPosition, lattice: LatticeD2Q9,
                        val u_x: Double) : BoundaryCondition(lattice, x0, x1, y0, y1) {
 
     val cells = lattice.cells
+
+    override fun defineBoundaryRhoU(rho: Double, U: DoubleArray) {
+        val boundaryU = when (position) {
+            BoundaryPosition.TOP -> doubleArrayOf(u_x, 0.0)
+            BoundaryPosition.BOTTOM -> doubleArrayOf(u_x, 0.0)
+            else -> throw OperationNotSupportedException()
+        }
+
+        for (i in x0..x1) {
+            for (j in y0..y1) {
+                lattice.cells[i][j].defineRhoU(rho, boundaryU)
+            }
+        }
+    }
 
     override fun getType(): BoundaryType {
         return BoundaryType.SLIDING
@@ -18,21 +33,21 @@ class ZhouHeUXBoundary(val position: BoundaryPosition, lattice: LatticeD2Q9,
     }
 
     override fun streamOutgoing(i: Int, j: Int) {
-
-
         when (position) {
             BoundaryPosition.BOTTOM -> {
                 val rho = cells[i][j].f[0] + cells[i][j].f[1] + cells[i][j].f[3] +
-                        + 2.0 * (cells[i][j].f[4] + cells[i][j].f[7] + cells[i][j].f[8])
+                        +2.0 * (cells[i][j].f[4] + cells[i][j].f[7] + cells[i][j].f[8])
 
                 cells[i][j].fBuf[2] = cells[i][j].f[4]
                 cells[i][j].fBuf[5] = cells[i][j].f[7] - 0.5 * (cells[i][j].f[1] - cells[i][j].f[3]) + 0.5 * rho * u_x
                 cells[i][j].fBuf[6] = cells[i][j].f[8] + 0.5 * (cells[i][j].f[1] - cells[i][j].f[3]) - 0.5 * rho * u_x
             }
-            else -> { throw UnsupportedOperationException("not implemented yet")}
+            else -> {
+                throw UnsupportedOperationException("not implemented yet")
+            }
         }
     }
-    
+
     override fun boundaryStream() {
         when (position) {
 //            BoundaryPosition.TOP -> {
@@ -72,7 +87,7 @@ class ZhouHeUXBoundary(val position: BoundaryPosition, lattice: LatticeD2Q9,
                         val jPlus = j + 1
 
                         val rho = cells[i][j].f[0] + cells[i][j].f[1] + cells[i][j].f[3] +
-                        + 2.0 * (cells[i][j].f[4] + cells[i][j].f[7] + cells[i][j].f[8])
+                                +2.0 * (cells[i][j].f[4] + cells[i][j].f[7] + cells[i][j].f[8])
 
                         // all wrong?
                         cells[i][j].fBuf[0] = cells[i][j].f[0]
@@ -88,7 +103,9 @@ class ZhouHeUXBoundary(val position: BoundaryPosition, lattice: LatticeD2Q9,
                     }
                 }
             }
-            else -> { throw UnsupportedOperationException("not implemented yet")}
+            else -> {
+                throw UnsupportedOperationException("not implemented yet")
+            }
         }
 
     }

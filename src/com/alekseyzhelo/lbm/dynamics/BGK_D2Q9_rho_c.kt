@@ -13,8 +13,8 @@ import com.alekseyzhelo.lbm.core.lattice.DescriptorD2Q9
 // TODO: finish or remove
 abstract class BGKDynamicsD2Q9_rho_c(val omega: Double) : Dynamics2DQ9 {
 
-    // TODO correct?
-    override fun computeEquilibrium(i: Int, Rho: Double, U: DoubleArray, uSqr: Double): Double {
+    // TODO correct? use?
+    fun computeEquilibrium(i: Int, Rho: Double, U: DoubleArray, uSqr: Double): Double {
         val c_u = DescriptorD2Q9.c[i][0] * U[0] + DescriptorD2Q9.c[i][1] * U[1]
         return Rho * DescriptorD2Q9.w[i] * (1 + 3.0 * c_u + 4.5 * c_u * c_u - 1.5 * uSqr)
     }
