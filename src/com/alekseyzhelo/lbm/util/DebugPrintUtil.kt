@@ -8,9 +8,9 @@ import com.alekseyzhelo.lbm.core.lattice.LatticeD2Q9
  */
 fun LatticeD2Q9.toDensityTable(mainF: Boolean): String {
     val computeRho = if (mainF)
-        { x: CellD2Q9 -> x.computeRho(x.f) }
+        { x: CellD2Q9 -> x.computeRho() }
     else
-        { x: CellD2Q9 -> x.computeRho(x.fBuf) }
+        { x: CellD2Q9 -> x.computeBufferRho() }
 
     return buildString {
         for (j in cells[0].size - 1 downTo 0) {
@@ -24,19 +24,24 @@ fun LatticeD2Q9.toDensityTable(mainF: Boolean): String {
 
 fun LatticeD2Q9.toVelocityTable(mainF: Boolean): String {
     val computeRho = if (mainF)
-        { x: CellD2Q9 -> x.computeRho(x.f) }
+        { x: CellD2Q9 -> x.computeRho() }
     else
-        { x: CellD2Q9 -> x.computeRho(x.fBuf) }
+        { x: CellD2Q9 -> x.computeBufferRho() }
 
-    val computeU: (x: CellD2Q9, Rho: Double) -> DoubleArray = if (mainF)
-        { x, Rho -> x.computeU(Rho, x.f) }
+    val computeU: (x: CellD2Q9, rho: Double) -> DoubleArray = if (mainF)
+        { x, Rho -> x.computeU(Rho) }
     else
-        { x, Rho -> x.computeU(Rho, x.fBuf) }
+        { x, Rho -> x.computeBufferU(Rho) }
+
+    val computeRhoU = if (mainF)
+        { x: CellD2Q9 -> x.computeRhoU() }
+    else
+        { x: CellD2Q9 -> x.computeBufferRhoU() }
 
     return buildString {
         for (j in cells[0].size - 1 downTo 0) {
             for (i in cells.indices) {
-                append("${printCellVelocity(cells[i][j].computeRhoU())}|")
+                append("${printCellVelocity(computeRhoU(cells[i][j]))}|")
             }
             appendln()
         }

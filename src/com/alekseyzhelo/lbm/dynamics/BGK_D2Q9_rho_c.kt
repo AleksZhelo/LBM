@@ -10,7 +10,7 @@ import com.alekseyzhelo.lbm.core.lattice.DescriptorD2Q9
 /**
  * To use with rho + 1 and no ifs in U calculation
  */
-// TODO: remove abstract when tested (or remove this class completely)
+// TODO: finish or remove
 abstract class BGKDynamicsD2Q9_rho_c(val omega: Double) : Dynamics2DQ9 {
 
     // TODO correct?

@@ -15,10 +15,10 @@ import java.util.stream.IntStream
 // TODO: units
 // TODO?: boundary conditions
 // TODO?: solids, etc
-// TODO: decouple corner handling
 class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundaries: Map<BoundaryPosition, Pair<BoundaryType, Double?>>) {
 
-    val cells = Array(LX, { column -> Array(LY, { cell -> CellD2Q9() }) })
+    // TODO: BLOCKER proper dynamics on boundaries
+    val cells = Array(LX, { column -> Array(LY, { cell -> CellD2Q9(dynamics) }) })
 
     private val leftBoundary: BoundaryCondition
     private val topBoundary: BoundaryCondition
@@ -72,15 +72,15 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
     }
 
     fun doStream(i: Int, iPlus: Int, iSub: Int, j: Int, jPlus: Int, jSub: Int) {
-        cells[i][j].fBuf[0] = cells[i][j].f[0];
-        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
-        cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
-        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
-        cells[i][jSub].fBuf[4] = cells[i][j].f[4];
-        cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
-        cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
-        cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
-        cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
+        cells[i][j].fBuf[0] = cells[i][j].f[0]
+        cells[iPlus][j].fBuf[1] = cells[i][j].f[1]
+        cells[i][jPlus].fBuf[2] = cells[i][j].f[2]
+        cells[iSub][j].fBuf[3] = cells[i][j].f[3]
+        cells[i][jSub].fBuf[4] = cells[i][j].f[4]
+        cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5]
+        cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6]
+        cells[iSub][jSub].fBuf[7] = cells[i][j].f[7]
+        cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8]
     }
 
     fun bulkCollide(x0: Int, x1: Int, y0: Int, y1: Int): Unit {
@@ -119,15 +119,15 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
                 dynamics.iniEquilibrium(cells[i][j], Rho, U)
             }
         }
-        // TODO: all below - necessary?
+
         if (topBoundary.getType() == BoundaryType.SLIDING || topBoundary.getType() == BoundaryType.ZHOU_HE_UX) {
             val UU = doubleArrayOf(topBoundary.getParam()!!, 0.0)
             for (i in 0..LX - 1) {
-                dynamics.iniEquilibrium(cells[i][LY-1], Rho, UU)
+                dynamics.iniEquilibrium(cells[i][LY - 1], Rho, UU)
             }
         } else {
             for (i in 0..LX - 1) {
-                dynamics.iniEquilibrium(cells[i][LY-1], Rho, U)
+                dynamics.iniEquilibrium(cells[i][LY - 1], Rho, U)
             }
         }
         if (bottomBoundary.getType() == BoundaryType.SLIDING || bottomBoundary.getType() == BoundaryType.ZHOU_HE_UX) {
@@ -180,7 +180,7 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
         var total = 0.0
         for (i in cells.indices) {
             for (j in cells[i].indices) {
-                total += cells[i][j].computeRho(cells[i][j].f)
+                total += cells[i][j].computeRho()
             }
         }
 
@@ -205,50 +205,24 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
         var jPlus = j + 1
         var jSub = LY - 1
 
-        cells[i][j].fBuf[0] = cells[i][j].f[0];
-        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
-        cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
-        cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
+        cells[i][j].fBuf[0] = cells[i][j].f[0]
+        cells[iPlus][j].fBuf[1] = cells[i][j].f[1]
+        cells[i][jPlus].fBuf[2] = cells[i][j].f[2]
+        cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5]
 
         when (leftBoundary.getType()) {
             BoundaryType.PERIODIC -> {
-                cells[iSub][j].fBuf[3] = cells[i][j].f[3];
-                cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
+                cells[iSub][j].fBuf[3] = cells[i][j].f[3]
+                cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6]
             }
             BoundaryType.NO_SLIP -> {
-                cells[i][j].fBuf[1] = cells[i][j].f[3];
-                cells[i][j].fBuf[8] = cells[i][j].f[6];
+                cells[i][j].fBuf[1] = cells[i][j].f[3]
+                cells[i][j].fBuf[8] = cells[i][j].f[6]
             }
+            else -> { throw UnsupportedOperationException("not implemented yet")}
         }
 
-        when (bottomBoundary.getType()) {
-            BoundaryType.PERIODIC -> {
-                cells[i][jSub].fBuf[4] = cells[i][j].f[4];
-                cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
-                cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
-            }
-            BoundaryType.NO_SLIP -> {
-                cells[i][j].fBuf[2] = cells[i][j].f[4];
-                cells[i][j].fBuf[5] = cells[i][j].f[7];
-                cells[i][j].fBuf[6] = cells[i][j].f[8];
-            }
-            BoundaryType.SLIDING -> {
-                val q = bottomBoundary.getParam()!! / (2.0 * cells[i][j].computeRhoU(cells[i][j].f)[0]) // TODO: correct as approximation to rho_w * u_w / (2.0 * f_8 - f_7)?
-                val p = 1.0 - q
-
-                cells[i][j].fBuf[2] = cells[i][j].f[4];
-                cells[i][j].fBuf[5] = p * cells[i][j].f[7] + q * cells[i][j].f[8];
-                cells[i][j].fBuf[6] = q * cells[i][j].f[7] + p * cells[i][j].f[8];
-            }
-            BoundaryType.ZHOU_HE_UX -> {
-                val rho = cells[i][j].f[0] + cells[i][j].f[1] + cells[i][j].f[3] +
-                        + 2.0 * (cells[i][j].f[4] + cells[i][j].f[7] + cells[i][j].f[8])
-
-                cells[i][j].fBuf[2] = cells[i][j].f[4];
-                cells[i][j].fBuf[5] = cells[i][j].f[7] - 0.5 * (cells[i][j].f[1] - cells[i][j].f[3]) + 0.5 * rho * bottomBoundary.getParam()!!;
-                cells[i][j].fBuf[6] = cells[i][j].f[8] + 0.5 * (cells[i][j].f[1] - cells[i][j].f[3]) - 0.5 * rho * bottomBoundary.getParam()!!;
-            }
-        }
+        bottomBoundary.streamOutgoing(i, j)
 
         // right bottom
         i = LX - 1
@@ -258,50 +232,24 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
         jPlus = j + 1
         jSub = LY - 1
 
-        cells[i][j].fBuf[0] = cells[i][j].f[0];
-        cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
-        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
-        cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
+        cells[i][j].fBuf[0] = cells[i][j].f[0]
+        cells[i][jPlus].fBuf[2] = cells[i][j].f[2]
+        cells[iSub][j].fBuf[3] = cells[i][j].f[3]
+        cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6]
 
         when (rightBoundary.getType()) {
             BoundaryType.PERIODIC -> {
-                cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
-                cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
+                cells[iPlus][j].fBuf[1] = cells[i][j].f[1]
+                cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5]
             }
             BoundaryType.NO_SLIP -> {
-                cells[i][j].fBuf[3] = cells[i][j].f[1];
-                cells[i][j].fBuf[7] = cells[i][j].f[5];
+                cells[i][j].fBuf[3] = cells[i][j].f[1]
+                cells[i][j].fBuf[7] = cells[i][j].f[5]
             }
+            else -> { throw UnsupportedOperationException("not implemented yet")}
         }
 
-        when (bottomBoundary.getType()) {
-            BoundaryType.PERIODIC -> {
-                cells[i][jSub].fBuf[4] = cells[i][j].f[4];
-                cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
-                cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
-            }
-            BoundaryType.NO_SLIP -> {
-                cells[i][j].fBuf[2] = cells[i][j].f[4];
-                cells[i][j].fBuf[5] = cells[i][j].f[7];
-                cells[i][j].fBuf[6] = cells[i][j].f[8];
-            }
-            BoundaryType.SLIDING -> {
-                val q = bottomBoundary.getParam()!! / (2.0 * cells[i][j].computeRhoU(cells[i][j].f)[0]) // TODO: correct as approximation to rho_w * u_w / (2.0 * f_8 - f_7)?
-                val p = 1.0 - q
-
-                cells[i][j].fBuf[2] = cells[i][j].f[4];
-                cells[i][j].fBuf[5] = p * cells[i][j].f[7] + q * cells[i][j].f[8];
-                cells[i][j].fBuf[6] = q * cells[i][j].f[7] + p * cells[i][j].f[8];
-            }
-            BoundaryType.ZHOU_HE_UX -> {
-                val rho = cells[i][j].f[0] + cells[i][j].f[1] + cells[i][j].f[3] +
-                        + 2.0 * (cells[i][j].f[4] + cells[i][j].f[7] + cells[i][j].f[8])
-
-                cells[i][j].fBuf[2] = cells[i][j].f[4];
-                cells[i][j].fBuf[5] = cells[i][j].f[7] - 0.5 * (cells[i][j].f[1] - cells[i][j].f[3]) + 0.5 * rho * bottomBoundary.getParam()!!;
-                cells[i][j].fBuf[6] = cells[i][j].f[8] + 0.5 * (cells[i][j].f[1] - cells[i][j].f[3]) - 0.5 * rho * bottomBoundary.getParam()!!;
-            }
-        }
+        bottomBoundary.streamOutgoing(i, j)
 
         // left top
         i = 0
@@ -311,42 +259,24 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
         jPlus = 0
         jSub = j - 1
 
-        cells[i][j].fBuf[0] = cells[i][j].f[0];
-        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
-        cells[i][jSub].fBuf[4] = cells[i][j].f[4];
-        cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
+        cells[i][j].fBuf[0] = cells[i][j].f[0]
+        cells[iPlus][j].fBuf[1] = cells[i][j].f[1]
+        cells[i][jSub].fBuf[4] = cells[i][j].f[4]
+        cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8]
 
         when (leftBoundary.getType()) {
             BoundaryType.PERIODIC -> {
-                cells[iSub][j].fBuf[3] = cells[i][j].f[3];
-                cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
+                cells[iSub][j].fBuf[3] = cells[i][j].f[3]
+                cells[iSub][jSub].fBuf[7] = cells[i][j].f[7]
             }
             BoundaryType.NO_SLIP -> {
-                cells[i][j].fBuf[1] = cells[i][j].f[3];
-                cells[i][j].fBuf[5] = cells[i][j].f[7];
+                cells[i][j].fBuf[1] = cells[i][j].f[3]
+                cells[i][j].fBuf[5] = cells[i][j].f[7]
             }
+            else -> { throw UnsupportedOperationException("not implemented yet")}
         }
 
-        when (topBoundary.getType()) {
-            BoundaryType.PERIODIC -> {
-                cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
-                cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
-                cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
-            }
-            BoundaryType.NO_SLIP -> {
-                cells[i][j].fBuf[4] = cells[i][j].f[2];
-                cells[i][j].fBuf[7] = cells[i][j].f[5];
-                cells[i][j].fBuf[8] = cells[i][j].f[6];
-            }
-            BoundaryType.SLIDING -> {
-                val q = topBoundary.getParam()!! / (2.0 * cells[i][j].computeRhoU(cells[i][j].f)[0])
-                val p = 1.0 - q
-
-                cells[i][j].fBuf[4] = cells[i][j].f[2];
-                cells[i][j].fBuf[7] = p * cells[i][j].f[5] + q * cells[i][j].f[6];
-                cells[i][j].fBuf[8] = q * cells[i][j].f[5] + p * cells[i][j].f[6];
-            }
-        }
+        topBoundary.streamOutgoing(i, j)
 
         // right top
         i = LX - 1
@@ -356,417 +286,24 @@ class LatticeD2Q9(val LX: Int, val LY: Int, val dynamics: Dynamics2DQ9, boundari
         jPlus = 0
         jSub = j - 1
 
-        cells[i][j].fBuf[0] = cells[i][j].f[0];
-        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
-        cells[i][jSub].fBuf[4] = cells[i][j].f[4];
-        cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
+        cells[i][j].fBuf[0] = cells[i][j].f[0]
+        cells[iSub][j].fBuf[3] = cells[i][j].f[3]
+        cells[i][jSub].fBuf[4] = cells[i][j].f[4]
+        cells[iSub][jSub].fBuf[7] = cells[i][j].f[7]
 
-        when (topBoundary.getType()) {
-            BoundaryType.PERIODIC -> {
-                cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
-                cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
-                cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
-            }
-            BoundaryType.NO_SLIP -> {
-                cells[i][j].fBuf[4] = cells[i][j].f[2];
-                cells[i][j].fBuf[7] = cells[i][j].f[5];
-                cells[i][j].fBuf[8] = cells[i][j].f[6];
-            }
-            BoundaryType.SLIDING -> {
-                val q = topBoundary.getParam()!! / (2.0 * cells[i][j].computeRhoU(cells[i][j].f)[0])
-                val p = 1.0 - q
-
-                cells[i][j].fBuf[4] = cells[i][j].f[2];
-                cells[i][j].fBuf[7] = p * cells[i][j].f[5] + q * cells[i][j].f[6];
-                cells[i][j].fBuf[8] = q * cells[i][j].f[5] + p * cells[i][j].f[6];
-            }
-        }
+        topBoundary.streamOutgoing(i, j)
 
         when (rightBoundary.getType()) {
             BoundaryType.PERIODIC -> {
-                cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
-                cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
+                cells[iPlus][j].fBuf[1] = cells[i][j].f[1]
+                cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8]
             }
             BoundaryType.NO_SLIP -> {
-                cells[i][j].fBuf[3] = cells[i][j].f[1];
-                cells[i][j].fBuf[6] = cells[i][j].f[8];
+                cells[i][j].fBuf[3] = cells[i][j].f[1]
+                cells[i][j].fBuf[6] = cells[i][j].f[8]
             }
+            else -> { throw UnsupportedOperationException("not implemented yet")}
         }
     }
 
-    private fun automaticCornersWrongBeautiful() {
-        // left bottom
-        var i = 0
-        var j = 0
-        var iPlus = i + 1
-        var iSub = LX - 1
-        var jPlus = j + 1
-        var jSub = LY - 1
-
-        cells[i][j].fBuf[0] = cells[i][j].f[0];
-        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
-        cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
-        cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
-
-        when (leftBoundary.getType()) {
-            BoundaryType.PERIODIC -> {
-                cells[iSub][j].fBuf[3] = cells[i][j].f[3];
-                cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
-            }
-            BoundaryType.NO_SLIP -> {
-                cells[i][j].fBuf[1] = cells[i][j].f[3];
-                cells[i][j].fBuf[8] = cells[i][j].f[6];
-            }
-        }
-
-        when (bottomBoundary.getType()) {
-            BoundaryType.PERIODIC -> {
-                cells[i][jSub].fBuf[4] = cells[i][j].f[4];
-                cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
-                cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
-            }
-            BoundaryType.NO_SLIP -> {
-                cells[i][j].fBuf[2] = cells[i][j].f[4];
-                cells[i][j].fBuf[5] = cells[i][j].f[7];
-                cells[i][j].fBuf[6] = cells[i][j].f[8];
-            }
-        }
-
-        // right bottom
-        i = LX - 1
-        j = 0
-        iPlus = 0
-        iSub = i - 1
-        jPlus = j + 1
-        jSub = LY - 1
-
-        cells[i][j].fBuf[0] = cells[i][j].f[0];
-        cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
-        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
-        cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
-
-        when (rightBoundary.getType()) {
-            BoundaryType.PERIODIC -> {
-                cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
-                cells[iPlus][jSub].fBuf[5] = cells[i][j].f[5];
-            }
-            BoundaryType.NO_SLIP -> {
-                cells[i][j].fBuf[3] = cells[i][j].f[1];
-                cells[i][j].fBuf[7] = cells[i][j].f[5];
-            }
-        }
-
-        when (bottomBoundary.getType()) {
-            BoundaryType.PERIODIC -> {
-                cells[i][jSub].fBuf[4] = cells[i][j].f[4];
-                cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
-                cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
-            }
-            BoundaryType.NO_SLIP -> {
-                cells[i][j].fBuf[2] = cells[i][j].f[4];
-                cells[i][j].fBuf[5] = cells[i][j].f[7];
-                cells[i][j].fBuf[6] = cells[i][j].f[8];
-            }
-        }
-
-        // left top
-        i = 0
-        j = LY - 1
-        iPlus = i + 1
-        iSub = LX - 1
-        jPlus = 0
-        jSub = j - 1
-
-        cells[i][j].fBuf[0] = cells[i][j].f[0];
-        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
-        cells[i][jSub].fBuf[4] = cells[i][j].f[4];
-        cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
-
-        when (leftBoundary.getType()) {
-            BoundaryType.PERIODIC -> {
-                cells[iSub][j].fBuf[3] = cells[i][j].f[3];
-                cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
-            }
-            BoundaryType.NO_SLIP -> {
-                cells[i][j].fBuf[1] = cells[i][j].f[3];
-                cells[i][j].fBuf[5] = cells[i][j].f[7];
-            }
-        }
-
-        when (topBoundary.getType()) {
-            BoundaryType.PERIODIC -> {
-                cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
-                cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
-                cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
-            }
-            BoundaryType.NO_SLIP -> {
-                cells[i][j].fBuf[4] = cells[i][j].f[2];
-                cells[i][j].fBuf[7] = cells[i][j].f[5];
-                cells[i][j].fBuf[8] = cells[i][j].f[6];
-            }
-        }
-
-        // right top
-        i = LX - 1
-        j = LY - 1
-        iPlus = 0
-        iSub = i - 1
-        jPlus = 0
-        jSub = j - 1
-
-        cells[i][j].fBuf[0] = cells[i][j].f[0];
-        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
-        cells[i][jSub].fBuf[4] = cells[i][j].f[4];
-        cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
-
-        when (topBoundary.getType()) {
-            BoundaryType.PERIODIC -> {
-                cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
-                cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
-                cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
-            }
-            BoundaryType.NO_SLIP -> {
-                cells[i][j].fBuf[4] = cells[i][j].f[2];
-                cells[i][j].fBuf[7] = cells[i][j].f[5];
-                cells[i][j].fBuf[8] = cells[i][j].f[6];
-            }
-        }
-
-        when (rightBoundary.getType()) {
-            BoundaryType.PERIODIC -> {
-                cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
-                cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
-            }
-            BoundaryType.NO_SLIP -> {
-                cells[i][j].fBuf[3] = cells[i][j].f[1];
-                cells[i][j].fBuf[6] = cells[i][j].f[8];
-            }
-        }
-    }
-
-    private fun purePeriodicCorners() {
-        //left bottom
-        var i = 0
-        var j = 0
-        var iPlus = i + 1
-        var iSub = LX - 1
-        var jPlus = j + 1
-        var jSub = LY - 1
-
-        cells[i][j].fBuf[0] = cells[i][j].f[0];
-        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
-        cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
-        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
-        cells[i][jSub].fBuf[4] = cells[i][j].f[4];
-        cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
-        cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
-        cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
-        cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
-
-        // right bottom
-        i = LX - 1
-        j = 0
-        iPlus = 0
-        iSub = i - 1
-        jPlus = j + 1
-        jSub = LY - 1
-
-        cells[i][j].fBuf[0] = cells[i][j].f[0];
-        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
-        cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
-        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
-        cells[i][jSub].fBuf[4] = cells[i][j].f[4];
-        cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
-        cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
-        cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
-        cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
-
-        // left top
-        i = 0
-        j = LY - 1
-        iPlus = i + 1
-        iSub = LX - 1
-        jPlus = 0
-        jSub = j - 1
-
-        cells[i][j].fBuf[0] = cells[i][j].f[0];
-        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
-        cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
-        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
-        cells[i][jSub].fBuf[4] = cells[i][j].f[4];
-        cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
-        cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
-        cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
-        cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
-
-        // right top
-        i = LX - 1
-        j = LY - 1
-        iPlus = 0
-        iSub = i - 1
-        jPlus = 0
-        jSub = j - 1
-
-        cells[i][j].fBuf[0] = cells[i][j].f[0];
-        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
-        cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
-        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
-        cells[i][jSub].fBuf[4] = cells[i][j].f[4];
-        cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
-        cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
-        cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
-        cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
-    }
-
-    private fun fullPeriodicCorners() {
-        //left bottom
-        var i = 0
-        var j = 0
-        var iPlus = i + 1
-        var iSub = LX - 1
-        var jPlus = j + 1
-        var jSub = LY - 1
-
-        cells[i][j].fBuf[0] = cells[i][j].f[0];
-        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
-        cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
-        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
-        cells[i][jSub].fBuf[4] = cells[i][j].f[4];
-        cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
-        cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
-        cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
-        cells[iPlus][jSub].fBuf[8] += cells[i][j].f[8];
-
-        // right bottom
-        i = LX - 1
-        j = 0
-        iPlus = 0
-        iSub = i - 1
-        jPlus = j + 1
-        jSub = LY - 1
-
-        cells[i][j].fBuf[0] = cells[i][j].f[0];
-        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
-        cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
-        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
-        cells[i][jSub].fBuf[4] = cells[i][j].f[4];
-        cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
-        cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
-        cells[iSub][jSub].fBuf[7] += cells[i][j].f[7];
-        cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
-
-        // left top
-        i = 0
-        j = LY - 1
-        iPlus = i + 1
-        iSub = LX - 1
-        jPlus = 0
-        jSub = j - 1
-
-        cells[i][j].fBuf[0] = cells[i][j].f[0];
-        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
-        cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
-        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
-        cells[i][jSub].fBuf[4] = cells[i][j].f[4];
-        cells[iPlus][jPlus].fBuf[5] += cells[i][j].f[5];
-        cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
-        cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
-        cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
-
-        // right top
-        i = LX - 1
-        j = LY - 1
-        iPlus = 0
-        iSub = i - 1
-        jPlus = 0
-        jSub = j - 1
-
-        cells[i][j].fBuf[0] = cells[i][j].f[0];
-        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
-        cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
-        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
-        cells[i][jSub].fBuf[4] = cells[i][j].f[4];
-        cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
-        cells[iSub][jPlus].fBuf[6] += cells[i][j].f[6];
-        cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
-        cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
-    }
-
-    private fun slipAndPeriodicCorners() { // top and bottom - no-slip, left and right - periodic
-        // left bottom
-        var i = 0
-        var j = 0
-        var iPlus = i + 1
-        var iSub = LX - 1
-        var jPlus = j + 1
-        var jSub = LY - 1
-
-        cells[i][j].fBuf[0] = cells[i][j].f[0];
-        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
-        cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
-        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
-        cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
-        cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
-
-        cells[i][j].fBuf[2] = cells[i][j].f[4];
-        cells[i][j].fBuf[5] = cells[i][j].f[7];
-        cells[i][j].fBuf[6] = cells[i][j].f[8];
-
-        // right bottom
-        i = LX - 1
-        j = 0
-        iPlus = 0
-        iSub = i - 1
-        jPlus = j + 1
-        jSub = LY - 1
-
-        cells[i][j].fBuf[0] = cells[i][j].f[0];
-        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
-        cells[i][jPlus].fBuf[2] = cells[i][j].f[2];
-        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
-        cells[iPlus][jPlus].fBuf[5] = cells[i][j].f[5];
-        cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6];
-
-        cells[i][j].fBuf[2] = cells[i][j].f[4];
-        cells[i][j].fBuf[5] = cells[i][j].f[7];
-        cells[i][j].fBuf[6] = cells[i][j].f[8];
-
-        // left top
-        i = 0
-        j = LY - 1
-        iPlus = i + 1
-        iSub = LX - 1
-        jPlus = 0
-        jSub = j - 1
-
-        cells[i][j].fBuf[0] = cells[i][j].f[0];
-        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
-        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
-        cells[i][jSub].fBuf[4] = cells[i][j].f[4];
-        cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
-        cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
-
-        cells[i][j].fBuf[4] = cells[i][j].f[2];
-        cells[i][j].fBuf[7] = cells[i][j].f[5];
-        cells[i][j].fBuf[8] = cells[i][j].f[6];
-
-        // right top
-        i = LX - 1
-        j = LY - 1
-        iPlus = 0
-        iSub = i - 1
-        jPlus = 0
-        jSub = j - 1
-
-        cells[i][j].fBuf[0] = cells[i][j].f[0];
-        cells[iPlus][j].fBuf[1] = cells[i][j].f[1];
-        cells[iSub][j].fBuf[3] = cells[i][j].f[3];
-        cells[i][jSub].fBuf[4] = cells[i][j].f[4];
-        cells[iSub][jSub].fBuf[7] = cells[i][j].f[7];
-        cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8];
-
-        cells[i][j].fBuf[4] = cells[i][j].f[2];
-        cells[i][j].fBuf[7] = cells[i][j].f[5];
-        cells[i][j].fBuf[8] = cells[i][j].f[6];
-    }
 }

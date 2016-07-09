@@ -3,8 +3,9 @@ package com.alekseyzhelo.lbm.gui.lwjgl
 import com.alekseyzhelo.lbm.boundary.BoundaryType
 import com.alekseyzhelo.lbm.cli.CLISettings
 import com.alekseyzhelo.lbm.cli.collectArguments
-import com.alekseyzhelo.lbm.core.statistics.LatticeStatistics
+import com.alekseyzhelo.lbm.statistics.LatticeStatistics
 import com.alekseyzhelo.lbm.gui.lwjgl.cli.CMSettings
+import com.alekseyzhelo.lbm.gui.lwjgl.render.GL11Renderer
 import com.alekseyzhelo.lbm.gui.lwjgl.render.GL30Renderer
 import com.alekseyzhelo.lbm.util.lattice.createBoundaries
 import com.alekseyzhelo.lbm.util.lattice.setupLattice
@@ -28,7 +29,7 @@ fun main(args: Array<String>) {
             BoundaryType.SLIDING, // top
             BoundaryType.NO_SLIP, // right
             BoundaryType.NO_SLIP, // bottom // ZHOU_HE_UX does not work :((((
-            tParam = 0.90, //0.61, //0.01,
+            tParam = 0.50, //0.61, //0.01,
             bParam = 0.1
     )
     val force = 0.00001

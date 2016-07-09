@@ -34,7 +34,7 @@ internal fun cellColor(normalized: Double): CharColor {
 fun CellD2Q9.drawPressureRatedValue(i: Int, j: Int,
                                     strLen: Int, minPressure: Double, maxPressure: Double,
                                     func: (Rho: Double) -> String): Unit {
-    val Rho = computeRho(f)
+    val Rho = computeRho()
     val color = cellColor(normalize(Rho, minPressure, maxPressure))
     Toolkit.printString(func(Rho), i * (strLen + 1), j, strLen, 1, color)
     Toolkit.printString("|", i * (strLen + 1) + strLen, j, 1, 1, white)
@@ -43,7 +43,7 @@ fun CellD2Q9.drawPressureRatedValue(i: Int, j: Int,
 fun CellD2Q9.drawVelocityRatedValue(i: Int, j: Int,
                                     strLen: Int, minUNorm: Double, maxUNorm: Double,
                                     func: (U: DoubleArray) -> String): Unit {
-    val U = computeRhoU(f)
+    val U = computeRhoU()
     val color = cellColor(normalize(norm(U), minUNorm, maxUNorm))
     Toolkit.printString(func(U), i * (strLen + 1), j, strLen, 1, color)
     Toolkit.printString("|", i * (strLen + 1) + strLen, j, 1, 1, white)

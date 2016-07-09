@@ -1,4 +1,4 @@
-package com.alekseyzhelo.lbm.core.statistics
+package com.alekseyzhelo.lbm.statistics
 
 import com.alekseyzhelo.lbm.util.norm
 

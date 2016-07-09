@@ -3,6 +3,7 @@ package com.alekseyzhelo.lbm.dynamics
 import com.alekseyzhelo.lbm.core.cell.CellD2Q9
 import com.alekseyzhelo.lbm.core.lattice.DescriptorD2Q9.c
 import com.alekseyzhelo.lbm.core.lattice.DescriptorD2Q9.w
+import com.alekseyzhelo.lbm.momenta.BulkMomenta
 
 /**
  * @author Aleks on 18-05-2016.
@@ -23,8 +24,8 @@ open class BGKDynamicsD2Q9(val omega: Double) : Dynamics2DQ9 {
 
     // TODO experiment with optimizations here
     override fun collide(cell: CellD2Q9): Unit {
-        val rho = cell.computeRho()
-        val U = cell.computeU(rho)
+        val rho = computeBufferRho(cell)
+        val U = computeBufferU(cell, rho)
 
         val ux = U[0]
         val uy = U[1]
@@ -59,6 +60,18 @@ open class BGKDynamicsD2Q9(val omega: Double) : Dynamics2DQ9 {
         cell[8] = (1 - omega) * cell.fBuf[8] +
                 omega * (rho_ * (1 + eqMult1 * (ux - uy) + eqMult2 * (ux - uy) * (ux - uy) - uSqr_3_2))
     }
+
+    override fun computeRho(cell: CellD2Q9) = BulkMomenta.computeRho(cell)
+
+    override fun computeU(cell: CellD2Q9, rho: Double) = BulkMomenta.computeU(cell, rho)
+
+    override fun computeRhoU(cell: CellD2Q9) = BulkMomenta.computeRhoU(cell)
+
+    override fun computeBufferRho(cell: CellD2Q9) = BulkMomenta.computeBufferRho(cell)
+
+    override fun computeBufferU(cell: CellD2Q9, rho: Double) = BulkMomenta.computeBufferU(cell, rho)
+
+    override fun computeBufferRhoU(cell: CellD2Q9) = BulkMomenta.computeBufferRhoU(cell)
 
     override fun toString(): String {
         return buildString { appendln("BGK dynamics. Omega: $omega") }

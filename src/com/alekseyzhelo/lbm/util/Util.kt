@@ -12,6 +12,8 @@ inline fun normalize(value: Double, minValue: Double, maxValue: Double): Double 
     return (value - minValue) / (maxValue - minValue)
 }
 
+val opposite = arrayListOf(0, 3, 4, 1, 2, 7, 8, 5, 6)
+
 fun norm(U: DoubleArray): Double {
     var norm = 0.0
     for (i in U.indices) {
@@ -42,7 +44,7 @@ fun normalize(U: DoubleArray): DoubleArray {
     for (i in ortVector.indices) {
         ortVector[i] /= norm
     }
-    return ortVector;
+    return ortVector
 }
 
 private val doubleFormat = DecimalFormat("+0.000;-0.000")

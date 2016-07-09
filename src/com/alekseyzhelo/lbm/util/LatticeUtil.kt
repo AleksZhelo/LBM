@@ -9,7 +9,7 @@ fun LatticeD2Q9.minDensity(): Double { // TODO can be called without a lattice? 
     var min = Double.MAX_VALUE
     for (i in cells.indices) {
         for (j in cells[i].indices) {
-            val Rho = cells[i][j].computeRho(cells[i][j].f)
+            val Rho = cells[i][j].computeRho()
             if (Rho < min) min = Rho
         }
     }
@@ -21,7 +21,7 @@ fun LatticeD2Q9.maxDensity(): Double { // TODO can be called without a lattice? 
     var max = 0.0
     for (i in cells.indices) {
         for (j in cells[i].indices) {
-            val Rho = cells[i][j].computeRho(cells[i][j].f)
+            val Rho = cells[i][j].computeRho()
             if (Rho > max) max = Rho
         }
     }
@@ -33,7 +33,7 @@ fun LatticeD2Q9.minVelocityNorm(): Double { // TODO can be called without a latt
     var min = Double.MAX_VALUE
     for (i in cells.indices) {
         for (j in cells[i].indices) {
-            val norm = norm(cells[i][j].computeRhoU(cells[i][j].f))
+            val norm = norm(cells[i][j].computeRhoU())
             if (norm < min) min = norm
         }
     }
@@ -45,7 +45,7 @@ fun LatticeD2Q9.maxVelocityNorm(): Double { // TODO can be called without a latt
     var max = 0.0
     for (i in cells.indices) {
         for (j in cells[i].indices) {
-            val norm = norm(cells[i][j].computeRhoU(cells[i][j].f))
+            val norm = norm(cells[i][j].computeRhoU())
             if (norm > max) max = norm
         }
     }

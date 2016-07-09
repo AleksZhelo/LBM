@@ -43,7 +43,7 @@ class GL11Renderer(
         val maxValue = velocityMax()
         for (i in cells.indices) {
             for (j in cells[0].indices) {
-                val value = norm(cells[i][j].computeRhoU(cells[i][j].f))
+                val value = norm(cells[i][j].computeRhoU())
                 val normalized = normalize(value, minValue, maxValue)
 
                 val color = colormap.getColor(normalized.toFloat())

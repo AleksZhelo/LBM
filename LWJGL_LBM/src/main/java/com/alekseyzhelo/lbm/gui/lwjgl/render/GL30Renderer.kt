@@ -3,7 +3,7 @@ package com.alekseyzhelo.lbm.gui.lwjgl.render
 import com.alekseyzhelo.lbm.cli.CLISettings
 import com.alekseyzhelo.lbm.core.cell.CellD2Q9
 import com.alekseyzhelo.lbm.core.lattice.LatticeD2Q9
-import com.alekseyzhelo.lbm.core.statistics.LatticeStatistics
+import com.alekseyzhelo.lbm.statistics.LatticeStatistics
 import com.alekseyzhelo.lbm.gui.lwjgl.cli.CMSettings
 import com.alekseyzhelo.lbm.gui.lwjgl.color.colormap.CoolwarmDiscreteColormap
 import com.alekseyzhelo.lbm.gui.lwjgl.render.mesh.MutableColourMesh

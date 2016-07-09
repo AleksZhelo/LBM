@@ -19,4 +19,12 @@ interface Dynamics2DQ9 {
     fun computeEquilibrium(i: Int, Rho: Double, U: DoubleArray, uSqr: Double): Double
     fun collide(cell: CellD2Q9): Unit
 
+    fun computeRho(cell: CellD2Q9): Double
+    fun computeU(cell: CellD2Q9, rho: Double): DoubleArray
+    fun computeRhoU(cell: CellD2Q9): DoubleArray
+
+    fun computeBufferRho(cell: CellD2Q9): Double
+    fun computeBufferU(cell: CellD2Q9, rho: Double): DoubleArray
+    fun computeBufferRhoU(cell: CellD2Q9): DoubleArray
+
 }

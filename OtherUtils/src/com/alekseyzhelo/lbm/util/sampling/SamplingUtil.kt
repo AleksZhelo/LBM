@@ -10,7 +10,7 @@ import java.util.*
 fun sampleAverageXSpeed(lattice: LatticeD2Q9, atY: Int): Double {
     var speed = 0.0
     for (x in lattice.cells.indices) {
-        speed += lattice.cells[x][atY].computeRhoU(lattice.cells[x][atY].f)[0];
+        speed += lattice.cells[x][atY].computeRhoU()[0]
     }
     speed /= lattice.cells.size
 
@@ -20,7 +20,7 @@ fun sampleAverageXSpeed(lattice: LatticeD2Q9, atY: Int): Double {
 fun sampleXSpeed(lattice: LatticeD2Q9, atX: Int): DoubleArray {
     val speed = ArrayList<Double>()
     for (y in lattice.cells[atX].indices) {
-        speed.add(lattice.cells[atX][y].computeRhoU(lattice.cells[atX][y].f)[0])
+        speed.add(lattice.cells[atX][y].computeRhoU()[0])
     }
 
     return speed.toDoubleArray()
@@ -31,7 +31,7 @@ fun sampleXSpeedAveragedByX(lattice: LatticeD2Q9): DoubleArray {
     val speed = DoubleArray(lattice.LY)
     for (x in lattice.cells.indices) {
         for (y in lattice.cells[x].indices) {
-            speed[y] += (lattice.cells[x][y].computeRhoU(lattice.cells[x][y].f)[0])
+            speed[y] += (lattice.cells[x][y].computeRhoU()[0])
         }
     }
 
@@ -47,7 +47,7 @@ fun sampleVectorField(lattice: LatticeD2Q9): Array<DoubleArray> {
     var k = 0
     for (x in lattice.cells.indices) {
         for (y in lattice.cells[x].indices) {
-            val U = lattice.cells[x][y].computeRhoU(lattice.cells[x][y].f)
+            val U = lattice.cells[x][y].computeRhoU()
             vectorField[k][0] = x.toDouble()
             vectorField[k][1] = y.toDouble()
             vectorField[k][2] = U[0]
