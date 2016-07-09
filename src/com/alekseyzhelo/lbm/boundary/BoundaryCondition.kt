@@ -31,6 +31,13 @@ enum class BoundaryType {
 abstract class BoundaryCondition(protected val lattice: LatticeD2Q9,
                                  val x0: Int, val x1: Int, val y0: Int, val y1: Int) {
 
+    abstract fun boundaryStream()
+    abstract fun getType(): BoundaryType
+    abstract fun getParam(): Double?
+    abstract fun streamOutgoing(i: Int, j: Int)
+
+    // TODO: optimize setting boundary rho, U
+
     open fun defineBoundaryRhoU(rho: Double, U: DoubleArray) {
         for (i in x0..x1) {
             for (j in y0..y1) {
@@ -39,9 +46,27 @@ abstract class BoundaryCondition(protected val lattice: LatticeD2Q9,
         }
     }
 
-    abstract fun boundaryStream()
-    abstract fun getType(): BoundaryType
-    abstract fun getParam(): Double?
-    abstract fun streamOutgoing(i: Int, j: Int)
+    open fun defineBoundaryRhoU(rho: Double, U: (i: Int, j: Int) -> DoubleArray) {
+        for (i in x0..x1) {
+            for (j in y0..y1) {
+                lattice.cells[i][j].defineRhoU(rho, U(i, j))
+            }
+        }
+    }
 
+    open fun defineBoundaryRhoU(rho: (i: Int, j: Int) -> Double, U: DoubleArray) {
+        for (i in x0..x1) {
+            for (j in y0..y1) {
+                lattice.cells[i][j].defineRhoU(rho(i, j), U)
+            }
+        }
+    }
+
+    open fun defineBoundaryRhoU(rho: (i: Int, j: Int) -> Double, U: (i: Int, j: Int) -> DoubleArray) {
+        for (i in x0..x1) {
+            for (j in y0..y1) {
+                lattice.cells[i][j].defineRhoU(rho(i, j), U(i, j))
+            }
+        }
+    }
 }

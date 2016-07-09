@@ -10,20 +10,6 @@ class ZhouHeUXBoundary(val position: BoundaryPosition, lattice: LatticeD2Q9,
 
     val cells = lattice.cells
 
-    override fun defineBoundaryRhoU(rho: Double, U: DoubleArray) {
-        val boundaryU = when (position) {
-            BoundaryPosition.TOP -> doubleArrayOf(u_x, 0.0)
-            BoundaryPosition.BOTTOM -> doubleArrayOf(u_x, 0.0)
-            else -> throw OperationNotSupportedException()
-        }
-
-        for (i in x0..x1) {
-            for (j in y0..y1) {
-                lattice.cells[i][j].defineRhoU(rho, boundaryU)
-            }
-        }
-    }
-
     override fun getType(): BoundaryType {
         return BoundaryType.SLIDING
     }
@@ -107,7 +93,55 @@ class ZhouHeUXBoundary(val position: BoundaryPosition, lattice: LatticeD2Q9,
                 throw UnsupportedOperationException("not implemented yet")
             }
         }
+    }
 
+    private fun boundaryVelocity(): DoubleArray {
+        val boundaryU = when (position) {
+            BoundaryPosition.TOP -> doubleArrayOf(u_x, 0.0)
+            BoundaryPosition.BOTTOM -> doubleArrayOf(u_x, 0.0)
+            else -> throw OperationNotSupportedException()
+        }
+        return boundaryU
+    }
+
+    override fun defineBoundaryRhoU(rho: Double, U: DoubleArray) {
+        val boundaryU = boundaryVelocity()
+
+        for (i in x0..x1) {
+            for (j in y0..y1) {
+                lattice.cells[i][j].defineRhoU(rho, boundaryU)
+            }
+        }
+    }
+
+    override fun defineBoundaryRhoU(rho: Double, U: (i: Int, j: Int) -> DoubleArray) {
+        val boundaryU = boundaryVelocity()
+
+        for (i in x0..x1) {
+            for (j in y0..y1) {
+                lattice.cells[i][j].defineRhoU(rho, boundaryU)
+            }
+        }
+    }
+
+    override fun defineBoundaryRhoU(rho: (i: Int, j: Int) -> Double, U: DoubleArray) {
+        val boundaryU = boundaryVelocity()
+
+        for (i in x0..x1) {
+            for (j in y0..y1) {
+                lattice.cells[i][j].defineRhoU(rho(i, j), boundaryU)
+            }
+        }
+    }
+
+    override fun defineBoundaryRhoU(rho: (i: Int, j: Int) -> Double, U: (i: Int, j: Int) -> DoubleArray) {
+        val boundaryU = boundaryVelocity()
+
+        for (i in x0..x1) {
+            for (j in y0..y1) {
+                lattice.cells[i][j].defineRhoU(rho(i, j), boundaryU)
+            }
+        }
     }
 
 }

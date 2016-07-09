@@ -8,21 +8,6 @@ class SlidingBoundary(val position: BoundaryPosition, lattice: LatticeD2Q9,
 
     val cells = lattice.cells
 
-    override fun defineBoundaryRhoU(rho: Double, U: DoubleArray) {
-        val slideU = when(position) {
-            BoundaryPosition.LEFT -> doubleArrayOf(0.0, slideVelocity)
-            BoundaryPosition.TOP -> doubleArrayOf(slideVelocity, 0.0)
-            BoundaryPosition.RIGHT -> doubleArrayOf(0.0, slideVelocity)
-            BoundaryPosition.BOTTOM -> doubleArrayOf(slideVelocity, 0.0)
-        }
-
-        for (i in x0..x1) {
-            for (j in y0..y1) {
-                lattice.cells[i][j].defineRhoU(rho, slideU)
-            }
-        }
-    }
-
     override fun getType(): BoundaryType {
         return BoundaryType.SLIDING
     }
@@ -106,6 +91,56 @@ class SlidingBoundary(val position: BoundaryPosition, lattice: LatticeD2Q9,
             }
         }
 
+    }
+
+    private fun slideVelocity(): DoubleArray {
+        val slideU = when (position) {
+            BoundaryPosition.LEFT -> doubleArrayOf(0.0, slideVelocity)
+            BoundaryPosition.TOP -> doubleArrayOf(slideVelocity, 0.0)
+            BoundaryPosition.RIGHT -> doubleArrayOf(0.0, slideVelocity)
+            BoundaryPosition.BOTTOM -> doubleArrayOf(slideVelocity, 0.0)
+        }
+        return slideU
+    }
+
+    override fun defineBoundaryRhoU(rho: Double, U: DoubleArray) {
+        val slideU = slideVelocity()
+
+        for (i in x0..x1) {
+            for (j in y0..y1) {
+                lattice.cells[i][j].defineRhoU(rho, slideU)
+            }
+        }
+    }
+
+    override fun defineBoundaryRhoU(rho: Double, U: (i: Int, j: Int) -> DoubleArray) {
+        val slideU = slideVelocity()
+
+        for (i in x0..x1) {
+            for (j in y0..y1) {
+                lattice.cells[i][j].defineRhoU(rho, slideU)
+            }
+        }
+    }
+
+    override fun defineBoundaryRhoU(rho: (i: Int, j: Int) -> Double, U: DoubleArray) {
+        val slideU = slideVelocity()
+
+        for (i in x0..x1) {
+            for (j in y0..y1) {
+                lattice.cells[i][j].defineRhoU(rho(i, j), slideU)
+            }
+        }
+    }
+
+    override fun defineBoundaryRhoU(rho: (i: Int, j: Int) -> Double, U: (i: Int, j: Int) -> DoubleArray) {
+        val slideU = slideVelocity()
+
+        for (i in x0..x1) {
+            for (j in y0..y1) {
+                lattice.cells[i][j].defineRhoU(rho(i, j), slideU)
+            }
+        }
     }
 
 }

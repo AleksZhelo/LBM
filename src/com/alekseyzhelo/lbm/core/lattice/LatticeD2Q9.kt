@@ -18,7 +18,12 @@ import java.util.stream.IntStream
 class LatticeD2Q9(val LX: Int, val LY: Int, dynamics: Dynamics2DQ9, boundaries: Map<BoundaryPosition, Pair<BoundaryType, Double?>>) {
 
     // TODO: BLOCKER proper dynamics on boundaries
-    val cells = Array(LX, { column -> Array(LY, { cell -> CellD2Q9(dynamics) }) })
+    val cells = Array(LX, { x ->
+        Array(LY, {
+            y ->
+            CellD2Q9(dynamics)
+        })
+    })
 
     private val leftBoundary: BoundaryCondition
     private val topBoundary: BoundaryCondition
@@ -107,63 +112,79 @@ class LatticeD2Q9(val LX: Int, val LY: Int, dynamics: Dynamics2DQ9, boundaries: 
         rightBoundary.boundaryStream()
         bottomBoundary.boundaryStream()
 
-        //purePeriodicCorners()
         automaticCorners()
-        //fullPeriodicCorners() // TODO: does not work? wtf?
-        //slipAndPeriodicCorners()
     }
 
     fun iniEquilibrium(rho: Double, U: DoubleArray): Unit { // constant U for the whole lattice
-        for (i in 0..LX - 1) {
+        for (i in 1..LX - 2) {
             for (j in 1..LY - 2) {
                 cells[i][j].defineRhoU(rho, U)
             }
         }
 
-        if (topBoundary.getType() == BoundaryType.SLIDING || topBoundary.getType() == BoundaryType.ZHOU_HE_UX) {
-            val UU = doubleArrayOf(topBoundary.getParam()!!, 0.0)
-            for (i in 0..LX - 1) {
-                cells[i][LY - 1].defineRhoU(rho, UU)
-            }
-        } else {
-            for (i in 0..LX - 1) {
-                cells[i][LY - 1].defineRhoU(rho, U)
-            }
-        }
-        if (bottomBoundary.getType() == BoundaryType.SLIDING || bottomBoundary.getType() == BoundaryType.ZHOU_HE_UX) {
-            val UU = doubleArrayOf(bottomBoundary.getParam()!!, 0.0)
-            for (i in 0..LX - 1) {
-                cells[i][0].defineRhoU(rho, UU)
-            }
-        } else {
-            for (i in 0..LX - 1) {
-                cells[i][0].defineRhoU(rho, U)
-            }
-        }
+        leftBoundary.defineBoundaryRhoU(rho, U)
+        topBoundary.defineBoundaryRhoU(rho, U)
+        rightBoundary.defineBoundaryRhoU(rho, U)
+        bottomBoundary.defineBoundaryRhoU(rho, U)
+
+        cells[0][0].defineRhoU(rho, U)
+        cells[LX - 1][0].defineRhoU(rho, U)
+        cells[0][LY - 1].defineRhoU(rho, U)
+        cells[LX - 1][LY - 1].defineRhoU(rho, U)
     }
 
     fun iniEquilibrium(rho: Double, U: (i: Int, j: Int) -> DoubleArray): Unit { // U as a function of the cell's location
-        for (i in cells.indices) {
-            for (j in cells[i].indices) {
+        for (i in 1..LX - 2) {
+            for (j in 1..LY - 2) {
                 cells[i][j].defineRhoU(rho, U(i, j))
             }
         }
+
+        leftBoundary.defineBoundaryRhoU(rho, U)
+        topBoundary.defineBoundaryRhoU(rho, U)
+        rightBoundary.defineBoundaryRhoU(rho, U)
+        bottomBoundary.defineBoundaryRhoU(rho, U)
+
+        cells[0][0].defineRhoU(rho, U(0, 0))
+        cells[LX - 1][0].defineRhoU(rho, U(LX - 1, 0))
+        cells[0][LY - 1].defineRhoU(rho, U(0, LY - 1))
+        cells[LX - 1][LY - 1].defineRhoU(rho, U(LX - 1, LY - 1))
     }
 
     fun iniEquilibrium(rho: (i: Int, j: Int) -> Double, U: DoubleArray): Unit { // rho as a function of the cell's location
-        for (i in cells.indices) {
-            for (j in cells[i].indices) {
+        for (i in 1..LX - 2) {
+            for (j in 1..LY - 2) {
                 cells[i][j].defineRhoU(rho(i, j), U)
             }
         }
+
+        leftBoundary.defineBoundaryRhoU(rho, U)
+        topBoundary.defineBoundaryRhoU(rho, U)
+        rightBoundary.defineBoundaryRhoU(rho, U)
+        bottomBoundary.defineBoundaryRhoU(rho, U)
+
+        cells[0][0].defineRhoU(rho(0, 0), U)
+        cells[LX - 1][0].defineRhoU(rho(LX - 1, 0), U)
+        cells[0][LY - 1].defineRhoU(rho(0, LY - 1), U)
+        cells[LX - 1][LY - 1].defineRhoU(rho(LX - 1, LY - 1), U)
     }
 
     fun iniEquilibrium(rho: (i: Int, j: Int) -> Double, U: (i: Int, j: Int) -> DoubleArray): Unit { // rho and U as functions of the cell's location
-        for (i in cells.indices) {
-            for (j in cells[i].indices) {
+        for (i in 0..LX - 2) {
+            for (j in 1..LY - 2) {
                 cells[i][j].defineRhoU(rho(i, j), U(i, j))
             }
         }
+
+        leftBoundary.defineBoundaryRhoU(rho, U)
+        topBoundary.defineBoundaryRhoU(rho, U)
+        rightBoundary.defineBoundaryRhoU(rho, U)
+        bottomBoundary.defineBoundaryRhoU(rho, U)
+
+        cells[0][0].defineRhoU(rho(0, 0), U(0, 0))
+        cells[LX - 1][0].defineRhoU(rho(LX - 1, 0), U(LX - 1, 0))
+        cells[0][LY - 1].defineRhoU(rho(0, LY - 1), U(0, LY - 1))
+        cells[LX - 1][LY - 1].defineRhoU(rho(LX - 1, LY - 1), U(LX - 1, LY - 1))
     }
 
 // TEST
@@ -219,7 +240,9 @@ class LatticeD2Q9(val LX: Int, val LY: Int, dynamics: Dynamics2DQ9, boundaries: 
                 cells[i][j].fBuf[1] = cells[i][j].f[3]
                 cells[i][j].fBuf[8] = cells[i][j].f[6]
             }
-            else -> { throw UnsupportedOperationException("not implemented yet")}
+            else -> {
+                throw UnsupportedOperationException("not implemented yet")
+            }
         }
 
         bottomBoundary.streamOutgoing(i, j)
@@ -246,7 +269,9 @@ class LatticeD2Q9(val LX: Int, val LY: Int, dynamics: Dynamics2DQ9, boundaries: 
                 cells[i][j].fBuf[3] = cells[i][j].f[1]
                 cells[i][j].fBuf[7] = cells[i][j].f[5]
             }
-            else -> { throw UnsupportedOperationException("not implemented yet")}
+            else -> {
+                throw UnsupportedOperationException("not implemented yet")
+            }
         }
 
         bottomBoundary.streamOutgoing(i, j)
@@ -273,7 +298,9 @@ class LatticeD2Q9(val LX: Int, val LY: Int, dynamics: Dynamics2DQ9, boundaries: 
                 cells[i][j].fBuf[1] = cells[i][j].f[3]
                 cells[i][j].fBuf[5] = cells[i][j].f[7]
             }
-            else -> { throw UnsupportedOperationException("not implemented yet")}
+            else -> {
+                throw UnsupportedOperationException("not implemented yet")
+            }
         }
 
         topBoundary.streamOutgoing(i, j)
@@ -302,7 +329,9 @@ class LatticeD2Q9(val LX: Int, val LY: Int, dynamics: Dynamics2DQ9, boundaries: 
                 cells[i][j].fBuf[3] = cells[i][j].f[1]
                 cells[i][j].fBuf[6] = cells[i][j].f[8]
             }
-            else -> { throw UnsupportedOperationException("not implemented yet")}
+            else -> {
+                throw UnsupportedOperationException("not implemented yet")
+            }
         }
     }
 
