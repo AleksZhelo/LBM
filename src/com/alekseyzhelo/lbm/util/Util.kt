@@ -1,6 +1,5 @@
 package com.alekseyzhelo.lbm.util
 
-import com.alekseyzhelo.lbm.core.lattice.DescriptorD2Q9
 import java.text.DecimalFormat
 import java.util.*
 

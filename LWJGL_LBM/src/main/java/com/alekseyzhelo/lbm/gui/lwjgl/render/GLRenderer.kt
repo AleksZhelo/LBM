@@ -2,6 +2,7 @@ package com.alekseyzhelo.lbm.gui.lwjgl.render
 
 import com.alekseyzhelo.lbm.cli.CLISettings
 import com.alekseyzhelo.lbm.core.cell.CellD2Q9
+import com.alekseyzhelo.lbm.core.lattice.LatticeD2
 import com.alekseyzhelo.lbm.core.lattice.LatticeD2Q9
 import com.alekseyzhelo.lbm.gui.lwjgl.cli.CMSettings
 import com.alekseyzhelo.lbm.gui.lwjgl.color.colormap.*
@@ -22,7 +23,7 @@ import org.lwjgl.system.MemoryUtil
 abstract class GLRenderer(
         val cli: CLISettings,
         val cm: CMSettings,
-        lattice: LatticeD2Q9,
+        lattice: LatticeD2,
         val WIDTH: Int = 750,
         val HEIGHT: Int = 750
 ) {

@@ -2,6 +2,7 @@ package com.alekseyzhelo.lbm.gui.lwjgl.render
 
 import com.alekseyzhelo.lbm.cli.CLISettings
 import com.alekseyzhelo.lbm.core.cell.CellD2Q9
+import com.alekseyzhelo.lbm.core.lattice.LatticeD2
 import com.alekseyzhelo.lbm.core.lattice.LatticeD2Q9
 import com.alekseyzhelo.lbm.gui.lwjgl.cli.CMSettings
 import com.alekseyzhelo.lbm.gui.lwjgl.render.GLRenderer
@@ -17,7 +18,7 @@ import org.lwjgl.opengl.GL11.*
 class GL11Renderer(
         cli: CLISettings,
         cm: CMSettings,
-        lattice: LatticeD2Q9,
+        lattice: LatticeD2,
         WIDTH: Int = 750,
         HEIGHT: Int = 750
 ) : GLRenderer(cli, cm, lattice, WIDTH, HEIGHT) {

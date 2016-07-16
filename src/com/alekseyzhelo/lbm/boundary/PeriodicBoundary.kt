@@ -1,26 +1,20 @@
 package com.alekseyzhelo.lbm.boundary
 
 import com.alekseyzhelo.lbm.core.lattice.DescriptorD2Q9
-import com.alekseyzhelo.lbm.core.lattice.LatticeD2Q9
+import com.alekseyzhelo.lbm.core.lattice.LatticeD2
 
-class PeriodicBoundary(val position: BoundaryPosition, lattice: LatticeD2Q9,
-                       x0: Int, x1: Int, y0: Int, y1: Int) : BoundaryCondition(lattice, x0, x1, y0, y1) {
-
-    val cells = lattice.cells
+class PeriodicBoundary(position: BoundaryPosition, lattice: LatticeD2,
+                       x0: Int, x1: Int, y0: Int, y1: Int) : BoundaryCondition(position, lattice, x0, x1, y0, y1) {
 
     override fun getType(): BoundaryType {
         return BoundaryType.PERIODIC
-    }
-
-    override fun getParam(): Double? {
-        return null
     }
 
     override fun streamOutgoing(i: Int, j: Int) {
         for (f in position.outgoing) {
             val x = Math.floorMod(i + DescriptorD2Q9.c[f][0], lattice.LX)
             val y = Math.floorMod(j + DescriptorD2Q9.c[f][1], lattice.LY)
-            cells[x][y].fBuf[f] = cells[i][j].f[f]
+            lattice.cells[x][y].fBuf[f] = lattice.cells[i][j].f[f]
         }
     }
 

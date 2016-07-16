@@ -1,6 +1,6 @@
 package com.alekseyzhelo.lbm.gui.simple.algs4
 
-import com.alekseyzhelo.lbm.core.lattice.LatticeD2Q9
+import com.alekseyzhelo.lbm.core.lattice.LatticeD2
 import com.alekseyzhelo.lbm.util.norm
 import com.alekseyzhelo.lbm.util.normalize
 import java.awt.Color
@@ -57,7 +57,7 @@ internal fun drawVectorValue(value: DoubleArray, i: Int, j: Int,
 }
 
 // TODO: how bad is this from an object-oriented design perspective?
-fun LatticeD2Q9.drawDensityTable(minDensity: Double, maxDensity: Double): Unit {
+fun LatticeD2.drawDensityTable(minDensity: Double, maxDensity: Double): Unit {
     for (i in cells.indices) {
         for (j in cells[0].indices) {
             drawScalarValue(cells[i][j].computeRho(), i, j, minDensity, maxDensity)
@@ -65,7 +65,7 @@ fun LatticeD2Q9.drawDensityTable(minDensity: Double, maxDensity: Double): Unit {
     }
 }
 
-fun LatticeD2Q9.drawVelocityNormTable(minVelocityNorm: Double, maxVelocityNorm: Double): Unit {
+fun LatticeD2.drawVelocityNormTable(minVelocityNorm: Double, maxVelocityNorm: Double): Unit {
     for (i in cells.indices) {
         for (j in cells[0].indices) {
             drawScalarValue(
@@ -76,7 +76,7 @@ fun LatticeD2Q9.drawVelocityNormTable(minVelocityNorm: Double, maxVelocityNorm: 
     }
 }
 
-fun LatticeD2Q9.drawVelocityVectorTable(minVelocityNorm: Double, maxVelocityNorm: Double): Unit {
+fun LatticeD2.drawVelocityVectorTable(minVelocityNorm: Double, maxVelocityNorm: Double): Unit {
     for (i in cells.indices) {
         for (j in cells[0].indices) {
             drawVectorValue(

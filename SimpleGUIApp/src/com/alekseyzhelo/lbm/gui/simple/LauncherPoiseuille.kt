@@ -98,7 +98,7 @@ fun main(args: Array<String>) {
     //ySamples.toDoubleArrayFile("Poiseuille_force_${force}_${cli.lx}x${cli.ly}_${cli.omega}_omega_${cli.time}_iterations_${dateFormat.format(Date())}.txt")
     val end = System.currentTimeMillis()
 
-    printExecutionTime(end, start)
+    printExecutionTime(end, start, time)
     println("Executed $time LBM steps.")
     printLine("Total density: ${lattice.totalDensity()}")
 }

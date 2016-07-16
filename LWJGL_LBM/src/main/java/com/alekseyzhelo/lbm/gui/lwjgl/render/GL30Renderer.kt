@@ -2,14 +2,13 @@ package com.alekseyzhelo.lbm.gui.lwjgl.render
 
 import com.alekseyzhelo.lbm.cli.CLISettings
 import com.alekseyzhelo.lbm.core.cell.CellD2Q9
+import com.alekseyzhelo.lbm.core.lattice.LatticeD2
 import com.alekseyzhelo.lbm.core.lattice.LatticeD2Q9
-import com.alekseyzhelo.lbm.statistics.LatticeStatistics
 import com.alekseyzhelo.lbm.gui.lwjgl.cli.CMSettings
-import com.alekseyzhelo.lbm.gui.lwjgl.color.colormap.CoolwarmDiscreteColormap
 import com.alekseyzhelo.lbm.gui.lwjgl.render.mesh.MutableColourMesh
 import com.alekseyzhelo.lbm.gui.lwjgl.render.shader.ShaderProgram
-import com.alekseyzhelo.lbm.gui.lwjgl.render.GLRenderer
 import com.alekseyzhelo.lbm.gui.lwjgl.util.ResourcesUtil
+import com.alekseyzhelo.lbm.statistics.LatticeStatistics
 import com.alekseyzhelo.lbm.util.norm
 import com.alekseyzhelo.lbm.util.normalize
 import org.joml.Matrix4f
@@ -28,7 +27,7 @@ import org.lwjgl.opengl.GL30.glBindVertexArray
 class GL30Renderer(
         cli: CLISettings,
         cm: CMSettings,
-        lattice: LatticeD2Q9,
+        lattice: LatticeD2,
         WIDTH: Int = 750,
         HEIGHT: Int = 750
 ) : GLRenderer(cli, cm, lattice, WIDTH, HEIGHT) {
@@ -147,8 +146,8 @@ class GL30Renderer(
             colors ->
             for (i in cells.indices) {
                 for (j in cells[0].indices) {
-                    //val value = cells[i][j].computeRho(cells[i][j].f)
-                    //val value = norm(cells[i][j].computeRhoU(cells[i][j].f))
+                    //val value = cells[i][j].computeRho()
+                    //val value = norm(cells[i][j].computeRhoU())
                     val value = norm(cells[i][j].U) // TODO: indicate that we are one iteration behind like this
                     val color = colormap.getColor(normalize(value, minValue, maxValue).toFloat())
 

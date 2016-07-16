@@ -6,6 +6,7 @@ import com.alekseyzhelo.lbm.util.norm
  * @author Aleks on 03-07-2016.
  */
 
+// TODO: currently works as a side effect of computeU and computeRhoU. Fix
 object LatticeStatistics {
 
     private var maxVelocity: Double = 0.0

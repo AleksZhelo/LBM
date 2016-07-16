@@ -1,13 +1,13 @@
 package com.alekseyzhelo.lbm.util.sampling
 
-import com.alekseyzhelo.lbm.core.lattice.LatticeD2Q9
+import com.alekseyzhelo.lbm.core.lattice.LatticeD2
 import java.util.*
 
 /**
  * @author Aleks on 19-06-2016.
  */
 
-fun sampleAverageXSpeed(lattice: LatticeD2Q9, atY: Int): Double {
+fun sampleAverageXSpeed(lattice: LatticeD2, atY: Int): Double {
     var speed = 0.0
     for (x in lattice.cells.indices) {
         speed += lattice.cells[x][atY].computeRhoU()[0]
@@ -17,7 +17,7 @@ fun sampleAverageXSpeed(lattice: LatticeD2Q9, atY: Int): Double {
     return speed
 }
 
-fun sampleXSpeed(lattice: LatticeD2Q9, atX: Int): DoubleArray {
+fun sampleXSpeed(lattice: LatticeD2, atX: Int): DoubleArray {
     val speed = ArrayList<Double>()
     for (y in lattice.cells[atX].indices) {
         speed.add(lattice.cells[atX][y].computeRhoU()[0])
@@ -27,7 +27,7 @@ fun sampleXSpeed(lattice: LatticeD2Q9, atX: Int): DoubleArray {
 }
 
 
-fun sampleXSpeedAveragedByX(lattice: LatticeD2Q9): DoubleArray {
+fun sampleXSpeedAveragedByX(lattice: LatticeD2): DoubleArray {
     val speed = DoubleArray(lattice.LY)
     for (x in lattice.cells.indices) {
         for (y in lattice.cells[x].indices) {
@@ -42,7 +42,7 @@ fun sampleXSpeedAveragedByX(lattice: LatticeD2Q9): DoubleArray {
     return speed
 }
 
-fun sampleVectorField(lattice: LatticeD2Q9): Array<DoubleArray> {
+fun sampleVectorField(lattice: LatticeD2): Array<DoubleArray> {
     val vectorField = Array(lattice.LX * lattice.LY, { x -> DoubleArray(4) })
     var k = 0
     for (x in lattice.cells.indices) {

@@ -1,9 +1,6 @@
 package com.alekseyzhelo.lbm.dynamics
 
 import com.alekseyzhelo.lbm.core.cell.CellD2Q9
-import com.alekseyzhelo.lbm.core.lattice.DescriptorD2Q9.c
-import com.alekseyzhelo.lbm.core.lattice.DescriptorD2Q9.w
-import com.alekseyzhelo.lbm.momenta.BulkMomenta
 
 /**
  * @author Aleks on 18-05-2016.

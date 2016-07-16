@@ -23,8 +23,8 @@ fun main(args: Array<String>) {
             BoundaryType.SLIDING, // top
             BoundaryType.NO_SLIP, // right
             BoundaryType.NO_SLIP, // bottom
-            tParam = 0.01,
-            bParam = 0.001
+            tParam = Pair(0.0, doubleArrayOf(0.001, 0.0)),
+            bParam = Pair(0.0, doubleArrayOf(0.0001, 0.0))
     )
     val force = 0.00001
     val lattice = setupLattice(cli, boundaries) //ConstantXForce_BGK_D2Q9(cli.omega, force), boundaries)
@@ -85,7 +85,7 @@ fun main(args: Array<String>) {
     //ySamples.toDoubleArrayFile("Poiseuille_force_${force}_${cli.lx}x${cli.ly}_${cli.omega}_omega_${cli.time}_iterations_${dateFormat.format(Date())}.txt")
     val end = System.currentTimeMillis()
 
-    printExecutionTime(end, start)
+    printExecutionTime(end, start, time)
     println("Executed $time LBM steps.")
     printLine("Total density: ${lattice.totalDensity()}")
 }
