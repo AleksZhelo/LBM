@@ -21,7 +21,6 @@ abstract class LatticeD2(val LX: Int, val LY: Int,
     init {
         this.boundaries = initBoundaries(boundaries)
         cells = initCells(dynamics)
-        print("done")
     }
 
     open protected fun initBoundaries(boundaries: List<BoundaryDescriptor>): Array<BoundaryCondition> {
