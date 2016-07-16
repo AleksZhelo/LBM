@@ -36,6 +36,7 @@ private val r = floatArrayOf(0.0f, 0.0f, 0.0f, 0.56470588f, 1.0f, 1.0f, 0.545098
 private val g = floatArrayOf(0.0f, 0.0f, 1.0f, 0.93333333f, 1.0f, 0.0f, 0.0f)
 private val b = floatArrayOf(0.54509804f, 1.0f, 1.0f, 0.56470588f, 0.0f, 0.0f, 0.0f)
 
+// TODO: extract to a color ramp colormap
 internal fun cellFColor(normalized: Float): FloatColor {
     val low = binarySearch(x, normalized)
     val high = low + 1
@@ -52,52 +53,3 @@ internal fun cellFColor(normalized: Float): FloatColor {
 //        return FColor(0.0f, 0.0f, 0.0f)
 //    }
 }
-
-//
-//internal fun drawScalarValue(value: Double, i: Int, j: Int,
-//                             minValue: Double, maxValue: Double): Unit {
-//    val color = cellColor(normalize(value, minValue, maxValue))
-//    FasterStdDraw.setPenColor(color);
-//    // FasterStdDraw.deferredFilledSquareTest((i).toDouble(), (LY - j).toDouble(), 1.0); // double r
-//    // TODO: why is j + 1 necessary? j leaves an empty row at the top..
-//    FasterStdDraw.deferredFilledSquareTest((i).toDouble(), (j + 1).toDouble(), 1.0); // double r
-//}
-//
-//internal fun drawVectorValue(value: DoubleArray, i: Int, j: Int,
-//                             minValue: Double, maxValue: Double): Unit {
-//    val color = cellColor(normalize(norm(value), minValue, maxValue))
-//    val ort = normalize(value)
-//    FasterStdDraw.setPenColor(color);
-//    // FasterStdDraw.deferredFilledSquareTest((i).toDouble(), (j + 1).toDouble(),  1.0); // double r
-//    FasterStdDraw.drawArrowLineTest((i).toDouble(), (j).toDouble(), i + ort[0], j + ort[1], 0.3, 0.2);
-//}
-//
-//fun LatticeD2Q9.drawDensityTable(minDensity: Double, maxDensity: Double): Unit {
-//    for (i in cells.indices) {
-//        for (j in cells[0].indices) {
-//            drawScalarValue(cells[i][j].computeRho(cells[i][j].f), i, j, minDensity, maxDensity)
-//        }
-//    }
-//}
-//
-//fun LatticeD2Q9.drawVelocityNormTable(minVelocityNorm: Double, maxVelocityNorm: Double): Unit {
-//    for (i in cells.indices) {
-//        for (j in cells[0].indices) {
-//            drawScalarValue(
-//                    norm(cells[i][j].computeRhoU(cells[i][j].f)),
-//                    i, j, minVelocityNorm, maxVelocityNorm
-//            )
-//        }
-//    }
-//}
-//
-//fun LatticeD2Q9.drawVelocityVectorTable(minVelocityNorm: Double, maxVelocityNorm: Double): Unit {
-//    for (i in cells.indices) {
-//        for (j in cells[0].indices) {
-//            drawVectorValue(
-//                    cells[i][j].computeRhoU(cells[i][j].f),
-//                    i, j, minVelocityNorm, maxVelocityNorm
-//            )
-//        }
-//    }
-//}

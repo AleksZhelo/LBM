@@ -47,7 +47,7 @@ abstract class LatticeD2(val LX: Int, val LY: Int,
         return null
     }
 
-    fun doStream(i: Int, iPlus: Int, iSub: Int, j: Int, jPlus: Int, jSub: Int) {
+    open fun doStream(i: Int, iPlus: Int, iSub: Int, j: Int, jPlus: Int, jSub: Int) {
         cells[i][j].fBuf[0] = cells[i][j].f[0]
         cells[iPlus][j].fBuf[1] = cells[i][j].f[1]
         cells[i][jPlus].fBuf[2] = cells[i][j].f[2]
@@ -59,7 +59,7 @@ abstract class LatticeD2(val LX: Int, val LY: Int,
         cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8]
     }
 
-    // TODO here the lattice velocity is hardcoded to be 1
+    // TODO? here the lattice velocity is hardcoded to be 1
     open protected fun innerStream(x0: Int, x1: Int, y0: Int, y1: Int): Unit {
         for (i in x0..x1) {
             for (j in y0..y1) {
@@ -70,7 +70,7 @@ abstract class LatticeD2(val LX: Int, val LY: Int,
         }
     }
 
-    fun bulkCollide(x0: Int, x1: Int, y0: Int, y1: Int): Unit {
+    open fun bulkCollide(x0: Int, x1: Int, y0: Int, y1: Int): Unit {
         for (i in x0..x1) {
             for (j in y0..y1) { // TODO performance?
                 cells[i][j].collide()
@@ -78,7 +78,7 @@ abstract class LatticeD2(val LX: Int, val LY: Int,
         }
     }
 
-    fun bulkCollideParallel(x0: Int, x1: Int, y0: Int, y1: Int): Unit {
+    open fun bulkCollideParallel(x0: Int, x1: Int, y0: Int, y1: Int): Unit {
         IntStream.range(x0, x1 + 1)
                 .parallel()
                 .forEach { i ->

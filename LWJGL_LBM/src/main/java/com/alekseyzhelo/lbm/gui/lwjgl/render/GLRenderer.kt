@@ -3,12 +3,10 @@ package com.alekseyzhelo.lbm.gui.lwjgl.render
 import com.alekseyzhelo.lbm.cli.CLISettings
 import com.alekseyzhelo.lbm.core.cell.CellD2Q9
 import com.alekseyzhelo.lbm.core.lattice.LatticeD2
-import com.alekseyzhelo.lbm.core.lattice.LatticeD2Q9
 import com.alekseyzhelo.lbm.gui.lwjgl.cli.CMSettings
 import com.alekseyzhelo.lbm.gui.lwjgl.color.colormap.*
-import com.alekseyzhelo.lbm.util.maxDensity
-import com.alekseyzhelo.lbm.util.maxVelocityNorm
-import com.alekseyzhelo.lbm.util.minDensity
+import com.alekseyzhelo.lbm.statistics.LatticeStatistics
+import com.alekseyzhelo.lbm.util.norm
 import org.lwjgl.BufferUtils
 import org.lwjgl.glfw.Callbacks.glfwFreeCallbacks
 import org.lwjgl.glfw.GLFW.*
@@ -34,18 +32,30 @@ abstract class GLRenderer(
     protected val width = BufferUtils.createIntBuffer(1)
     protected val height = BufferUtils.createIntBuffer(1)
 
-    private val maxVelocityNorm = lattice.maxVelocityNorm()
-    private val minDensity = lattice.minDensity()
-    private val maxDensity = lattice.maxDensity()
-
-    protected val velocityMax = if (cli.noRescale) { -> maxVelocityNorm } else { -> lattice.maxVelocityNorm() }
-    protected val densityMin = if (cli.noRescale) { -> minDensity } else { -> lattice.minDensity() }
-    protected val densityMax = if (cli.noRescale) { -> maxDensity } else { -> lattice.maxDensity() }
-
     protected val colormap: Colormap
+
+    protected val minValue: () -> Double
+    protected val maxValue: () -> Double
+    protected val cellValue: (cell: CellD2Q9) -> Double
 
     init {
         colormap = resolveColormap()
+
+        if (cli.noRescale) {
+            LatticeStatistics.configure(false, false)
+        } else {
+            LatticeStatistics.configure(!cli.drawVelocities, cli.drawVelocities)
+        }
+
+        if (cli.drawVelocities) {
+            minValue = { 0.0 }
+            maxValue = { LatticeStatistics.maxVelocity }
+            cellValue = { cell: CellD2Q9 -> norm(cell.U) } // TODO: indicate that we are one iteration behind like this
+        } else {
+            minValue = { LatticeStatistics.minDensity }
+            maxValue = { LatticeStatistics.maxDensity }
+            cellValue = { cell: CellD2Q9 -> cell.computeRho() }
+        }
     }
 
     val frame: (cells: Array<Array<CellD2Q9>>) -> Unit = if (cli.headless) { x -> Unit } else { x -> doFrame(x) }

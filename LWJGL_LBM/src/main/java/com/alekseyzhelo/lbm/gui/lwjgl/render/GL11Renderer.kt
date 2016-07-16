@@ -40,12 +40,10 @@ class GL11Renderer(
         /* Render  quads */
         glBegin(GL_QUADS)
 
-        val minValue = 0.0
-        val maxValue = velocityMax()
         for (i in cells.indices) {
             for (j in cells[0].indices) {
-                val value = norm(cells[i][j].computeRhoU())
-                val normalized = normalize(value, minValue, maxValue)
+                val value = cellValue(cells[i][j])
+                val normalized = normalize(value, minValue(), maxValue())
 
                 val color = colormap.getColor(normalized.toFloat())
                 glColor3f(color.r, color.g, color.b)

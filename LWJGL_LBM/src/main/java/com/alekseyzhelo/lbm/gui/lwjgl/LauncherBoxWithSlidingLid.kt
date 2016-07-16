@@ -30,7 +30,7 @@ fun main(args: Array<String>) {
 
 //    val boundaries = createBoundaries(
 //            BoundaryType.NO_SLIP, // left
-//            BoundaryType.SLIDING, // top
+//            BoundaryType.NO_SLIP, // top
 //            BoundaryType.NO_SLIP, // right
 //            BoundaryType.NO_SLIP, // bottom // ZHOU_HE_UX does not work :((((
 //            tParam = Pair(-0.0, doubleArrayOf(0.50, 0.0)), //0.61, //0.01,
@@ -58,12 +58,13 @@ fun main(args: Array<String>) {
     //lattice.iniEquilibrium(density, doubleArrayOf(0.0, 0.0))
     lattice.iniEquilibrium(density, doubleArrayOf(inletUX, 0.0))
 
-    println("Min density: ${lattice.minDensity()}")
-    println("Max density: ${lattice.maxDensity()}")
-    println("Max velocity norm: ${lattice.maxVelocityNorm()}")
+    LatticeStatistics.init(lattice)
+
+    println("Min density: ${LatticeStatistics.minDensity}")
+    println("Max density: ${LatticeStatistics.maxDensity}")
+    println("Max velocity norm: ${LatticeStatistics.maxVelocity}")
 
     val printLine = { x: Any -> if (cli.verbose) println(x) }
-    //val visualize = setupVisualizer(cli, lattice)
     val renderer = GL30Renderer(cli, cm, lattice, 512, 512)
     renderer.initialize()
 
@@ -83,7 +84,6 @@ fun main(args: Array<String>) {
             lattice.bulkCollideParallel(0, cli.lx - 1, 0, cli.ly - 1)
         //if(time > 20000) {
         renderer.frame(lattice.cells)
-        // TODO: optimize LatticeStatistics out when it's not necessary
         LatticeStatistics.reset()
         //}
         if (time % 100 == 0) {

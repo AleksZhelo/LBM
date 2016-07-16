@@ -61,7 +61,9 @@ object BulkMomenta : Momenta {
      */
 
     override fun computeRho(cell: CellD2Q9): Double {
-        return cell[0] + cell[1] + cell[2] + cell[3] + cell[4] + cell[5] + cell[6] + cell[7] + cell[8]
+        val rho = cell[0] + cell[1] + cell[2] + cell[3] + cell[4] + cell[5] + cell[6] + cell[7] + cell[8]
+        LatticeStatistics.gatherMinMaxDensity(rho)
+        return rho
     }
 
     override fun computeU(cell: CellD2Q9, rho: Double): DoubleArray {
@@ -72,12 +74,13 @@ object BulkMomenta : Momenta {
         }
         cell.U[0] = (cell[1] + cell[5] + cell[8] - cell[3] - cell[6] - cell[7]) / rho
         cell.U[1] = (cell[2] + cell[5] + cell[6] - cell[4] - cell[7] - cell[8]) / rho
-        LatticeStatistics.gatherMaxVel(cell.U)
+        LatticeStatistics.gatherMaxVelocity(cell.U)
         return cell.U
     }
 
     override fun computeRhoU(cell: CellD2Q9): DoubleArray {
         val rho = cell[0] + cell[1] + cell[2] + cell[3] + cell[4] + cell[5] + cell[6] + cell[7] + cell[8]
+        LatticeStatistics.gatherMinMaxDensity(rho)
         if (rho == 0.0) { // TODO clutch, find a way to remove
             cell.U[0] = 0.0
             cell.U[1] = 0.0
@@ -85,12 +88,14 @@ object BulkMomenta : Momenta {
         }
         cell.U[0] = (cell[1] + cell[5] + cell[8] - cell[3] - cell[6] - cell[7]) / rho
         cell.U[1] = (cell[2] + cell[5] + cell[6] - cell[4] - cell[7] - cell[8]) / rho
-        LatticeStatistics.gatherMaxVel(cell.U)
+        LatticeStatistics.gatherMaxVelocity(cell.U)
         return cell.U
     }
 
     override fun computeBufferRho(cell: CellD2Q9): Double {
-        return cell.fBuf[0] + cell.fBuf[1] + cell.fBuf[2] + cell.fBuf[3] + cell.fBuf[4] + cell.fBuf[5] + cell.fBuf[6] + cell.fBuf[7] + cell.fBuf[8]
+        val rho = cell.fBuf[0] + cell.fBuf[1] + cell.fBuf[2] + cell.fBuf[3] + cell.fBuf[4] + cell.fBuf[5] + cell.fBuf[6] + cell.fBuf[7] + cell.fBuf[8]
+        LatticeStatistics.gatherMinMaxDensity(rho)
+        return rho
     }
 
     override fun computeBufferU(cell: CellD2Q9, rho: Double): DoubleArray {
@@ -101,12 +106,13 @@ object BulkMomenta : Momenta {
         }
         cell.U[0] = (cell.fBuf[1] + cell.fBuf[5] + cell.fBuf[8] - cell.fBuf[3] - cell.fBuf[6] - cell.fBuf[7]) / rho
         cell.U[1] = (cell.fBuf[2] + cell.fBuf[5] + cell.fBuf[6] - cell.fBuf[4] - cell.fBuf[7] - cell.fBuf[8]) / rho
-        LatticeStatistics.gatherMaxVel(cell.U)
+        LatticeStatistics.gatherMaxVelocity(cell.U)
         return cell.U
     }
 
     override fun computeBufferRhoU(cell: CellD2Q9): DoubleArray {
         val rho = cell.fBuf[0] + cell.fBuf[1] + cell.fBuf[2] + cell.fBuf[3] + cell.fBuf[4] + cell.fBuf[5] + cell.fBuf[6] + cell.fBuf[7] + cell.fBuf[8]
+        LatticeStatistics.gatherMinMaxDensity(rho)
         if (rho == 0.0) { // TODO clutch, find a way to remove
             cell.U[0] = 0.0
             cell.U[1] = 0.0
@@ -114,7 +120,7 @@ object BulkMomenta : Momenta {
         }
         cell.U[0] = (cell.fBuf[1] + cell.fBuf[5] + cell.fBuf[8] - cell.fBuf[3] - cell.fBuf[6] - cell.fBuf[7]) / rho
         cell.U[1] = (cell.fBuf[2] + cell.fBuf[5] + cell.fBuf[6] - cell.fBuf[4] - cell.fBuf[7] - cell.fBuf[8]) / rho
-        LatticeStatistics.gatherMaxVel(cell.U)
+        LatticeStatistics.gatherMaxVelocity(cell.U)
         return cell.U
     }
 
@@ -133,6 +139,7 @@ class BoundaryMomenta(val position: BoundaryPosition) : Momenta {
         for (f in position.inside) {
             rho += cell[f]
         }
+        LatticeStatistics.gatherMinMaxDensity(rho)
         return rho
     }
 
@@ -148,7 +155,7 @@ class BoundaryMomenta(val position: BoundaryPosition) : Momenta {
         }
         cell.U[0] /= rho
         cell.U[1] /= rho
-        LatticeStatistics.gatherMaxVel(cell.U)
+        LatticeStatistics.gatherMaxVelocity(cell.U)
         return cell.U
     }
 
@@ -157,6 +164,7 @@ class BoundaryMomenta(val position: BoundaryPosition) : Momenta {
         for (f in position.inside) {
             rho += cell[f]
         }
+        LatticeStatistics.gatherMinMaxDensity(rho)
 
         cell.U[0] = 0.0
         cell.U[1] = 0.0
@@ -169,7 +177,7 @@ class BoundaryMomenta(val position: BoundaryPosition) : Momenta {
         }
         cell.U[0] /= rho
         cell.U[1] /= rho
-        LatticeStatistics.gatherMaxVel(cell.U)
+        LatticeStatistics.gatherMaxVelocity(cell.U)
         return cell.U
     }
 
@@ -178,6 +186,7 @@ class BoundaryMomenta(val position: BoundaryPosition) : Momenta {
         for (f in position.inside) {
             rho += cell.fBuf[f]
         }
+        LatticeStatistics.gatherMinMaxDensity(rho)
         return rho
     }
 
@@ -193,7 +202,7 @@ class BoundaryMomenta(val position: BoundaryPosition) : Momenta {
         }
         cell.U[0] /= rho
         cell.U[1] /= rho
-        LatticeStatistics.gatherMaxVel(cell.U)
+        LatticeStatistics.gatherMaxVelocity(cell.U)
         return cell.U
     }
 
@@ -202,6 +211,7 @@ class BoundaryMomenta(val position: BoundaryPosition) : Momenta {
         for (f in position.inside) {
             rho += cell.fBuf[f]
         }
+        LatticeStatistics.gatherMinMaxDensity(rho)
 
         cell.U[0] = 0.0
         cell.U[1] = 0.0
@@ -214,7 +224,7 @@ class BoundaryMomenta(val position: BoundaryPosition) : Momenta {
         }
         cell.U[0] /= rho
         cell.U[1] /= rho
-        LatticeStatistics.gatherMaxVel(cell.U)
+        LatticeStatistics.gatherMaxVelocity(cell.U)
         return cell.U
     }
 

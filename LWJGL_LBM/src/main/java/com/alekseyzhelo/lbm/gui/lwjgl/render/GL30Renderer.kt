@@ -136,20 +136,12 @@ class GL30Renderer(
         glViewport(0, 0, width.get(), height.get())
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 
-        val minValue = 0.0
-        //val minValue = densityMin() // TODO: optimize,
-        //val maxValue = densityMax() // TODO: can be done in one loop
-        //val maxValue = velocityMax()  // TODO: apparently this takes a ton of time
-        val maxValue = LatticeStatistics.getMaxVel()  // TODO: does this statistics thing still take a ton of time?
-
         mesh?.updateColourBuffer {
             colors ->
             for (i in cells.indices) {
                 for (j in cells[0].indices) {
-                    //val value = cells[i][j].computeRho()
-                    //val value = norm(cells[i][j].computeRhoU())
-                    val value = norm(cells[i][j].U) // TODO: indicate that we are one iteration behind like this
-                    val color = colormap.getColor(normalize(value, minValue, maxValue).toFloat())
+                    val value = cellValue(cells[i][j])
+                    val color = colormap.getColor(normalize(value, minValue(), maxValue()).toFloat())
 
                     colors.put(color.r)
                     colors.put(color.g)
