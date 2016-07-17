@@ -5,15 +5,17 @@ import com.alekseyzhelo.lbm.boundary.D2BoundaryFactory
 import com.alekseyzhelo.lbm.boundary.descriptor.BoundaryDescriptor
 import com.alekseyzhelo.lbm.core.cell.CellD2Q9
 import com.alekseyzhelo.lbm.dynamics.Dynamics2DQ9
+import java.awt.image.BufferedImage
 import java.util.stream.IntStream
 
 /**
  * @author Aleks on 16-07-2016.
  */
 
-
+// TODO: how do I remove this hack?
 abstract class LatticeD2(val LX: Int, val LY: Int,
-                         boundaries: List<BoundaryDescriptor>, dynamics: Dynamics2DQ9) {
+                         boundaries: List<BoundaryDescriptor>, dynamics: Dynamics2DQ9,
+                         val hack: BufferedImage? = null) {
     // TODO: SOFT-BLOCKER figure out proper dynamics on boundaries
     val cells: Array<Array<CellD2Q9>>
     val boundaries: Array<BoundaryCondition>
@@ -47,6 +49,22 @@ abstract class LatticeD2(val LX: Int, val LY: Int,
         return null
     }
 
+    open fun stream(): Unit {
+        innerStream(1, LX - 2, 1, LY - 2)
+        for (boundary in boundaries) {
+            boundary.boundaryStream()
+        }
+    }
+
+    // TODO? here the lattice velocity is hardcoded to be 1
+    open protected fun innerStream(x0: Int, x1: Int, y0: Int, y1: Int): Unit {
+        for (i in x0..x1) {
+            for (j in y0..y1) {
+                doStream(i, i + 1, i - 1, j, j + 1, j - 1)
+            }
+        }
+    }
+
     open fun doStream(i: Int, iPlus: Int, iSub: Int, j: Int, jPlus: Int, jSub: Int) {
         cells[i][j].fBuf[0] = cells[i][j].f[0]
         cells[iPlus][j].fBuf[1] = cells[i][j].f[1]
@@ -57,17 +75,6 @@ abstract class LatticeD2(val LX: Int, val LY: Int,
         cells[iSub][jPlus].fBuf[6] = cells[i][j].f[6]
         cells[iSub][jSub].fBuf[7] = cells[i][j].f[7]
         cells[iPlus][jSub].fBuf[8] = cells[i][j].f[8]
-    }
-
-    // TODO? here the lattice velocity is hardcoded to be 1
-    open protected fun innerStream(x0: Int, x1: Int, y0: Int, y1: Int): Unit {
-        for (i in x0..x1) {
-            for (j in y0..y1) {
-                // TODO if (!is_interior_solid_node[i][j]) {
-                doStream(i, i + 1, i - 1, j, j + 1, j - 1)
-                // TODO }
-            }
-        }
     }
 
     open fun bulkCollide(x0: Int, x1: Int, y0: Int, y1: Int): Unit {
@@ -85,13 +92,6 @@ abstract class LatticeD2(val LX: Int, val LY: Int,
                     IntStream.range(y0, y1 + 1)
                             .forEach { j -> cells[i][j].collide() }
                 }
-    }
-
-    open fun stream(): Unit {
-        innerStream(1, LX - 2, 1, LY - 2)
-        for (boundary in boundaries) {
-            boundary.boundaryStream()
-        }
     }
 
     fun iniEquilibrium(rho: Double, U: DoubleArray): Unit { // constant U for the whole lattice

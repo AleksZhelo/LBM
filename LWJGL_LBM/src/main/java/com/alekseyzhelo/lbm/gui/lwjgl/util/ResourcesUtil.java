@@ -2,6 +2,9 @@ package com.alekseyzhelo.lbm.gui.lwjgl.util;
 
 import com.opencsv.CSVReader;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
@@ -20,6 +23,12 @@ public class ResourcesUtil {
     public static List<String[]> loadCSVResource(String fileName) throws Exception {
         CSVReader reader = new CSVReader(new InputStreamReader(ResourcesUtil.class.getClass().getResourceAsStream(fileName)));
         return reader.readAll();
+    }
+
+    public static BufferedImage loadImageResource(String fileName) throws IOException {
+        // using this stream the image is loaded asynchronously
+        //InputStream stream = ResourcesUtil.class.getClass().getResourceAsStream(fileName);
+        return ImageIO.read(ResourcesUtil.class.getClass().getResource(fileName));
     }
 
 }

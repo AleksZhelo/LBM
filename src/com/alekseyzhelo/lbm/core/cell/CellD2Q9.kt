@@ -8,7 +8,7 @@ import com.alekseyzhelo.lbm.dynamics.Dynamics2DQ9
  * @author Aleks on 18-05-2016.
  */
 // TODO: add 1 to rho for improved numerical stability? What are the other modifications to make that work properly?
-class CellD2Q9(val dynamics: Dynamics2DQ9) {
+open class CellD2Q9(val dynamics: Dynamics2DQ9) {
 
     // NB: Streaming is possible with a single cells array
     // (see http://optilb.com/openlb/wp-content/uploads/2011/12/olb-tr1.pdf)

@@ -1,16 +1,14 @@
 package com.alekseyzhelo.lbm.gui.lwjgl
 
-import com.alekseyzhelo.lbm.boundary.BoundaryType
 import com.alekseyzhelo.lbm.cli.CLISettings
 import com.alekseyzhelo.lbm.cli.collectArguments
-import com.alekseyzhelo.lbm.functions.columnPressureWaveRho
-import com.alekseyzhelo.lbm.functions.multiplePressureWaveRho
-import com.alekseyzhelo.lbm.functions.rowPressureWaveRho
+import com.alekseyzhelo.lbm.core.lattice.MaterialsLatticeD2Q9
+import com.alekseyzhelo.lbm.dynamics.BGKDynamicsD2Q9
 import com.alekseyzhelo.lbm.gui.lwjgl.cli.CMSettings
 import com.alekseyzhelo.lbm.gui.lwjgl.render.GL30Renderer
+import com.alekseyzhelo.lbm.gui.lwjgl.util.ResourcesUtil
 import com.alekseyzhelo.lbm.statistics.LatticeStatistics
-import com.alekseyzhelo.lbm.util.lattice.createBoundaries
-import com.alekseyzhelo.lbm.util.lattice.setupLattice
+import com.alekseyzhelo.lbm.util.MaterialUtil
 import com.alekseyzhelo.lbm.util.maxVelocityNorm
 import com.alekseyzhelo.lbm.util.sampling.sampleVectorField
 import com.alekseyzhelo.lbm.util.sampling.toDoubleArrFile
@@ -25,44 +23,29 @@ fun main(args: Array<String>) {
     val cm = CMSettings()
     collectArguments("LWJGL_LBM.jar", arrayOf(cli, cm), args)
 
-//    val boundaries = createBoundaries(
-//            BoundaryType.NO_SLIP, // left
-//            BoundaryType.NO_SLIP, // top
-//            BoundaryType.NO_SLIP, // right
-//            BoundaryType.NO_SLIP, // bottom // ZHOU_HE_UX does not work :((((
-//            tParam = Pair(-0.0, doubleArrayOf(0.50, 0.0)), //0.61, //0.01,
-//            bParam = Pair(-0.0, doubleArrayOf(0.10, 0.0))
-//    )
-
-    val inletUX = 0.10
+    val inletUX = 0.50
     val density = 1.0
-    val boundaries = createBoundaries(
-            BoundaryType.INLET, // left
-            BoundaryType.NO_SLIP, // top
-            BoundaryType.OUTLET, // right
-            BoundaryType.NO_SLIP, // bottom // ZHOU_HE_UX does not work :((((
-            lParam = Pair(density, doubleArrayOf(inletUX, 0.0)), //0.61, //0.01,
-            tParam = Pair(density, doubleArrayOf(-0.1, 0.0)),
-            rParam = Pair(inletUX, doubleArrayOf(-0.0, -0.0)),
-            bParam = Pair(density, doubleArrayOf(-0.1, 0.0))
+    //val image = ResourcesUtil.loadImageResource("/lattices/oscillator_Jan.bmp")
+    val image = ResourcesUtil.loadImageResource("/lattices/oscillator_medium.bmp")
+    cli.lx = image.width
+    cli.ly = image.height
+    val lattice = MaterialsLatticeD2Q9(
+            image,
+            cli.omega,
+            BGKDynamicsD2Q9(cli.omega)
     )
-    val force = 0.00001
-    val lattice = setupLattice(cli, boundaries) //, ConstantXForce_BGK_D2Q9(cli.omega, force), boundaries)
-    //lattice.iniEquilibrium(multiplePressureWaveRho(cli.lx, cli.ly, 4, 4, 4.5), doubleArrayOf(0.0, 0.0))
-    //lattice.iniEquilibrium(squareEmptyRho(cli.lx, cli.ly, 4, 4, 0.1), doubleArrayOf(0.0, 0.0))
-    //lattice.iniEquilibrium(columnPressureWaveRho(cli.lx, cli.ly, 10, 1.5), doubleArrayOf(0.0, 0.0))
-    //lattice.iniEquilibrium(rowPressureWaveRho(cli.lx, cli.ly, 100, 1.05), doubleArrayOf(0.0, 0.0))
-    //lattice.iniEquilibrium(density, doubleArrayOf(0.0, 0.0))
-    lattice.iniEquilibrium(density, doubleArrayOf(inletUX, 0.0))
+    lattice.iniEquilibrium(density, doubleArrayOf(0.0, 0.0))
+    //lattice.iniEquilibrium(density, doubleArrayOf(inletUX, 0.0))
 
     LatticeStatistics.init(lattice)
+    MaterialUtil.configure(density, doubleArrayOf(inletUX, 0.0))
 
     println("Min density: ${LatticeStatistics.minDensity}")
     println("Max density: ${LatticeStatistics.maxDensity}")
     println("Max velocity norm: ${LatticeStatistics.maxVelocity}")
 
     val printLine = { x: Any -> if (cli.verbose) println(x) }
-    val renderer = GL30Renderer(cli, cm, lattice, 512, 512)
+    val renderer = GL30Renderer(cli, cm, lattice, 800, 600)
     renderer.initialize()
 
     renderer.frame(lattice.cells)
@@ -87,11 +70,11 @@ fun main(args: Array<String>) {
             printLine("time: $time, max velocity: ${lattice.maxVelocityNorm()}")
             printLine("Total density: ${lattice.totalDensity()}")
         }
-//        if(time == 5000) {
-//            val field = sampleVectorField(lattice)
-//            field.toDoubleArrFile("vectorField5000_works.txt")
-//            break
-//        }
+        if(time % 1000 == 0) {
+            val field = sampleVectorField(lattice)
+            field.toDoubleArrFile("proper_oscillator_${time}_${cli.omega}_${inletUX}.txt")
+            // break
+        }
         //printLine("Min density: ${lattice.minDensity()}")
         //printLine("Max density: ${lattice.maxDensity()}")
         //printLine("Min velocity: ${lattice.minVelocityNorm()}")

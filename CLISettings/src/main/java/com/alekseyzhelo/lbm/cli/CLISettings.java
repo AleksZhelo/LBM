@@ -59,6 +59,16 @@ public class CLISettings {
         return ly;
     }
 
+    // TODO: hack for image-specified lattice, improve
+
+    public void setLx(Integer lx) {
+        this.lx = lx;
+    }
+
+    public void setLy(Integer ly) {
+        this.ly = ly;
+    }
+
     public Boolean getDrawVelocities() {
         return drawVelocities;
     }
