@@ -4,9 +4,11 @@ import com.alekseyzhelo.lbm.core.lattice.DescriptorD2Q9
 import com.alekseyzhelo.lbm.core.lattice.LatticeD2
 import com.alekseyzhelo.lbm.util.opposite
 
-class OutletBoundary(position: BoundaryPosition, lattice: LatticeD2,
-                     x0: Int, x1: Int, y0: Int, y1: Int,
-                     val inletVelocity: Double) : BoundaryCondition(position, lattice, x0, x1, y0, y1) {
+class OutletBoundary(
+    position: BoundaryPosition, lattice: LatticeD2,
+    x0: Int, x1: Int, y0: Int, y1: Int,
+    val inletVelocity: Double
+) : BoundaryCondition(position, lattice, x0, x1, y0, y1) {
 
     override fun getType(): BoundaryType {
         return BoundaryType.OUTLET
@@ -23,7 +25,8 @@ class OutletBoundary(position: BoundaryPosition, lattice: LatticeD2,
         for (i in x0..x1) {
             for (j in y0..y1) {
                 for (f in position.inside) {
-                    lattice.cells[i + DescriptorD2Q9.c[f][0]][j + DescriptorD2Q9.c[f][1]].fBuf[f] = lattice.cells[i][j].f[f]
+                    lattice.cells[i + DescriptorD2Q9.c[f][0]][j + DescriptorD2Q9.c[f][1]].fBuf[f] =
+                        lattice.cells[i][j].f[f]
                 }
 
                 val r = reflectionProbability(lattice.cells[i][j].computeRhoU())
@@ -34,9 +37,7 @@ class OutletBoundary(position: BoundaryPosition, lattice: LatticeD2,
         }
     }
 
-    // TODO: fix the whole design to allow hiding this function
-    fun reflectionProbability(U: DoubleArray): Double {
-        // TODO: right? wrong?
+    private fun reflectionProbability(U: DoubleArray): Double {
         val u = when (position) {
             BoundaryPosition.LEFT -> U[0]
             BoundaryPosition.TOP -> U[1]
@@ -44,7 +45,6 @@ class OutletBoundary(position: BoundaryPosition, lattice: LatticeD2,
             BoundaryPosition.BOTTOM -> U[1]
         }
         val r = 1.0 + 4.0 * (u - inletVelocity) / (1.0 - 2.0 * u)
-        // TODO: right? wrong?
         return if (r > 1.0) 1.0 else if (r < 0.0) 0.0 else r
     }
 

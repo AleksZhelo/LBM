@@ -93,7 +93,8 @@ object BulkMomenta : Momenta {
     }
 
     override fun computeBufferRho(cell: CellD2Q9): Double {
-        val rho = cell.fBuf[0] + cell.fBuf[1] + cell.fBuf[2] + cell.fBuf[3] + cell.fBuf[4] + cell.fBuf[5] + cell.fBuf[6] + cell.fBuf[7] + cell.fBuf[8]
+        val rho =
+            cell.fBuf[0] + cell.fBuf[1] + cell.fBuf[2] + cell.fBuf[3] + cell.fBuf[4] + cell.fBuf[5] + cell.fBuf[6] + cell.fBuf[7] + cell.fBuf[8]
         LatticeStatistics.gatherMinMaxDensity(rho)
         return rho
     }
@@ -111,7 +112,8 @@ object BulkMomenta : Momenta {
     }
 
     override fun computeBufferRhoU(cell: CellD2Q9): DoubleArray {
-        val rho = cell.fBuf[0] + cell.fBuf[1] + cell.fBuf[2] + cell.fBuf[3] + cell.fBuf[4] + cell.fBuf[5] + cell.fBuf[6] + cell.fBuf[7] + cell.fBuf[8]
+        val rho =
+            cell.fBuf[0] + cell.fBuf[1] + cell.fBuf[2] + cell.fBuf[3] + cell.fBuf[4] + cell.fBuf[5] + cell.fBuf[6] + cell.fBuf[7] + cell.fBuf[8]
         LatticeStatistics.gatherMinMaxDensity(rho)
         if (rho == 0.0) { // TODO clutch, find a way to remove
             cell.U[0] = 0.0

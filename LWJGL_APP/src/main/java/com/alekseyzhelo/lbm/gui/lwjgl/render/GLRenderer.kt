@@ -41,12 +41,6 @@ abstract class GLRenderer(
     init {
         colormap = resolveColormap()
 
-        if (cli.noRescale) {
-            LatticeStatistics.configure(false, false)
-        } else {
-            LatticeStatistics.configure(!cli.drawVelocities, cli.drawVelocities)
-        }
-
         if (cli.drawVelocities) {
             minValue = { 0.0 }
             maxValue = { LatticeStatistics.maxVelocity }
@@ -124,8 +118,8 @@ abstract class GLRenderer(
 
         // Make the OpenGL context current
         glfwMakeContextCurrent(window)
-        // Enable v-sync
-        glfwSwapInterval(1)
+        // Disable v-sync
+        glfwSwapInterval(0)
 
         // Make the window visible
         glfwShowWindow(window)

@@ -20,10 +20,18 @@ object LatticeStatistics {
     private var gatherDensity = false
     private var gatherVelocity = false
 
-    fun init(lattice: LatticeD2){
+    fun init(lattice: LatticeD2) {
         maxVelocity = lattice.maxVelocityNorm()
         minDensity = lattice.minDensity()
         maxDensity = lattice.maxDensity()
+    }
+
+    fun initVerbose(lattice: LatticeD2) {
+        init(lattice)
+
+        println("Min density: $minDensity")
+        println("Max density: $maxDensity")
+        println("Max velocity norm: $maxVelocity")
     }
 
     fun configure(gatherDensity: Boolean, gatherVelocity: Boolean) {
@@ -32,7 +40,7 @@ object LatticeStatistics {
     }
 
     fun gatherMinMaxDensity(rho: Double) {
-        if(gatherDensity) {
+        if (gatherDensity) {
             if (rho > maxDensity) {
                 maxDensity = rho
             } else if (rho < minDensity) {
@@ -42,7 +50,7 @@ object LatticeStatistics {
     }
 
     fun gatherMaxVelocity(U: DoubleArray) {
-        if(gatherVelocity) {
+        if (gatherVelocity) {
             val norm = norm(U)
             if (norm > maxVelocity) {
                 maxVelocity = norm
@@ -51,11 +59,11 @@ object LatticeStatistics {
     }
 
     fun reset() {
-        if(gatherDensity) {
+        if (gatherDensity) {
             minDensity = Double.MAX_VALUE
             maxDensity = 0.0
         }
-        if(gatherVelocity) {
+        if (gatherVelocity) {
             maxVelocity = 0.0
         }
     }

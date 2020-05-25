@@ -13,9 +13,10 @@ import com.alekseyzhelo.lbm.dynamics.NoDynamics
  */
 // TODO: some kind of statistics, output, etc
 // TODO: units
-class LatticeD2Q9(LX: Int, LY: Int, omega: Double, dynamics: Dynamics2DQ9,
-                  boundaries: List<BoundaryDescriptor>)
-: LatticeD2(LX, LY, boundaries, dynamics) {
+class LatticeD2Q9(
+    LX: Int, LY: Int, omega: Double, dynamics: Dynamics2DQ9,
+    boundaries: List<BoundaryDescriptor>
+) : LatticeD2(LX, LY, boundaries, dynamics) {
 
     private val leftBoundary = findBoundary(BoundaryPosition.LEFT)
     private val topBoundary = findBoundary(BoundaryPosition.TOP)
@@ -23,12 +24,11 @@ class LatticeD2Q9(LX: Int, LY: Int, omega: Double, dynamics: Dynamics2DQ9,
     private val bottomBoundary = findBoundary(BoundaryPosition.BOTTOM)
 
     override fun initCells(dynamics: Dynamics2DQ9): Array<Array<CellD2Q9>> {
-        return Array(LX, { x ->
-            Array(LY, {
-                y ->
+        return Array(LX) { x ->
+            Array(LY) { y ->
                 createCell(dynamics, x, y)
-            })
-        })
+            }
+        }
     }
 
     private fun createCell(dynamics: Dynamics2DQ9, x: Int, y: Int): CellD2Q9 {

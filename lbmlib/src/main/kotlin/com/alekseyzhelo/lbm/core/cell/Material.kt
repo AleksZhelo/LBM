@@ -6,7 +6,7 @@ import java.util.*
  * @author Aleks on 17-07-2016.
  */
 
-val streamable = EnumSet.of(Material.FLOW, Material.INFLOW, Material.OUTFLOW)
+val streamable: EnumSet<Material> = EnumSet.of(Material.FLOW, Material.INFLOW, Material.OUTFLOW)
 
 enum class Material(val color: Int) {
     NOTHING(0xFFFFFFFF.toInt()),

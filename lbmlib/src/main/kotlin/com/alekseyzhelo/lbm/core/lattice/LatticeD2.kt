@@ -13,9 +13,11 @@ import java.util.stream.IntStream
  */
 
 // TODO: how do I remove this hack?
-abstract class LatticeD2(val LX: Int, val LY: Int,
-                         boundaries: List<BoundaryDescriptor>, dynamics: Dynamics2DQ9,
-                         val hack: BufferedImage? = null) {
+abstract class LatticeD2(
+    val LX: Int, val LY: Int,
+    boundaries: List<BoundaryDescriptor>, dynamics: Dynamics2DQ9,
+    val hack: BufferedImage? = null
+) {
     // TODO: SOFT-BLOCKER figure out proper dynamics on boundaries
     val cells: Array<Array<CellD2Q9>>
     val boundaries: Array<BoundaryCondition>
@@ -25,18 +27,18 @@ abstract class LatticeD2(val LX: Int, val LY: Int,
         cells = initCells(dynamics)
     }
 
-    open protected fun initBoundaries(boundaries: List<BoundaryDescriptor>): Array<BoundaryCondition> {
-        return Array(boundaries.size, { i: Int ->
+    protected open fun initBoundaries(boundaries: List<BoundaryDescriptor>): Array<BoundaryCondition> {
+        return Array(boundaries.size) { i: Int ->
             val desc = boundaries[i]
             D2BoundaryFactory.create(
-                    desc.position, desc.type, this,
-                    desc.x0, desc.x1, desc.y0, desc.y1,
-                    desc.doubleParam, desc.doubleArrayParam
+                desc.position, desc.type, this,
+                desc.x0, desc.x1, desc.y0, desc.y1,
+                desc.doubleParam, desc.doubleArrayParam
             )
-        })
+        }
     }
 
-    abstract protected fun initCells(dynamics: Dynamics2DQ9): Array<Array<CellD2Q9>>
+    protected abstract fun initCells(dynamics: Dynamics2DQ9): Array<Array<CellD2Q9>>
 
     // TODO: slow?
     protected fun boundaryContains(i: Int, j: Int): BoundaryCondition? {
@@ -57,7 +59,7 @@ abstract class LatticeD2(val LX: Int, val LY: Int,
     }
 
     // TODO? here the lattice velocity is hardcoded to be 1
-    open protected fun innerStream(x0: Int, x1: Int, y0: Int, y1: Int): Unit {
+    protected open fun innerStream(x0: Int, x1: Int, y0: Int, y1: Int): Unit {
         for (i in x0..x1) {
             for (j in y0..y1) {
                 doStream(i, i + 1, i - 1, j, j + 1, j - 1)
@@ -87,11 +89,11 @@ abstract class LatticeD2(val LX: Int, val LY: Int,
 
     open fun bulkCollideParallel(x0: Int, x1: Int, y0: Int, y1: Int): Unit {
         IntStream.range(x0, x1 + 1)
-                .parallel()
-                .forEach { i ->
-                    IntStream.range(y0, y1 + 1)
-                            .forEach { j -> cells[i][j].collide() }
-                }
+            .parallel()
+            .forEach { i ->
+                IntStream.range(y0, y1 + 1)
+                    .forEach { j -> cells[i][j].collide() }
+            }
     }
 
     fun iniEquilibrium(rho: Double, U: DoubleArray): Unit { // constant U for the whole lattice
@@ -145,7 +147,10 @@ abstract class LatticeD2(val LX: Int, val LY: Int,
         cells[LX - 1][LY - 1].defineRhoU(rho(LX - 1, LY - 1), U)
     }
 
-    fun iniEquilibrium(rho: (Int, Int) -> Double, U: (Int, Int) -> DoubleArray): Unit { // rho and U as functions of the cell's location
+    fun iniEquilibrium(
+        rho: (Int, Int) -> Double,
+        U: (Int, Int) -> DoubleArray
+    ): Unit { // rho and U as functions of the cell's location
         for (i in 0..LX - 2) {
             for (j in 1..LY - 2) {
                 cells[i][j].defineRhoU(rho(i, j), U(i, j))

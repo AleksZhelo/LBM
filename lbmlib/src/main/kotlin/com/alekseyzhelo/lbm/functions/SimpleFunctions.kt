@@ -7,58 +7,56 @@ package com.alekseyzhelo.lbm.functions
 // TODO: or functors?
 // TODO: should I turn these into usual functions? What is the difference between declaring them like this
 // TODO: and the usual way?
-val pressureWaveRho: (lx: Int, ly: Int, waveCenterRho: Double) -> (i: Int, j: Int) -> Double
-        =
-        { lx, ly, waveCenterRho ->
-            val balancedRho = 1.0 - (waveCenterRho - 1.0) / (lx * ly)
-            { i: Int, j: Int ->
-                if (i == lx / 2 && j == ly / 2) {
-                    waveCenterRho
-                } else {
-                    balancedRho
-                }
+val pressureWaveRho: (lx: Int, ly: Int, waveCenterRho: Double) -> (i: Int, j: Int) -> Double =
+    { lx, ly, waveCenterRho ->
+        val balancedRho = 1.0 - (waveCenterRho - 1.0) / (lx * ly)
+        { i: Int, j: Int ->
+            if (i == lx / 2 && j == ly / 2) {
+                waveCenterRho
+            } else {
+                balancedRho
             }
         }
+    }
 
-val multiplePressureWaveRho: (lx: Int, ly: Int, waveX: Int, waveY: Int, waveCenterRho: Double) -> (i: Int, j: Int) -> Double
-        =
-        { lx, ly, waveX, waveY, waveCenterRho ->
-            val balancedRho = 1.0 - (waveX * waveY * (waveCenterRho - 1.0)) / (lx * ly)
-            val centerX = lx / 2
-            val centerY = ly / 2
-            { i: Int, j: Int ->
-                when {
-                    (i >= centerX - waveX / 2) && (i <= centerX + waveX / 2)
-                            && (j >= centerY - waveY / 2) && (j <= centerY + waveY / 2) -> waveCenterRho
-                    else -> balancedRho
-                }
+val multiplePressureWaveRho: (lx: Int, ly: Int, waveX: Int, waveY: Int, waveCenterRho: Double) -> (i: Int, j: Int) -> Double =
+    { lx, ly, waveX, waveY, waveCenterRho ->
+        val balancedRho = 1.0 - (waveX * waveY * (waveCenterRho - 1.0)) / (lx * ly)
+        val centerX = lx / 2
+        val centerY = ly / 2
+        { i: Int, j: Int ->
+            when {
+                (i >= centerX - waveX / 2) && (i <= centerX + waveX / 2)
+                        && (j >= centerY - waveY / 2) && (j <= centerY + waveY / 2) -> waveCenterRho
+                else -> balancedRho
             }
         }
+    }
 
 val columnPressureWaveRho =
-        { lx: Int, ly: Int, waveXPos: Int, waveRho: Double ->
-            val balancedRho = 1.0 - (ly * (waveRho - 1.0)) / (lx * ly)
-            { i: Int, j: Int ->
-                when {
-                    (i == waveXPos) -> waveRho
-                    else -> balancedRho
-                }
+    { lx: Int, ly: Int, waveXPos: Int, waveRho: Double ->
+        val balancedRho = 1.0 - (ly * (waveRho - 1.0)) / (lx * ly)
+        { i: Int, j: Int ->
+            when {
+                (i == waveXPos) -> waveRho
+                else -> balancedRho
             }
         }
+    }
 
 val rowPressureWaveRho =
-        { lx: Int, ly: Int, waveYPos: Int, waveRho: Double ->
-            val balancedRho = 1.0 - (lx * (waveRho - 1.0)) / (lx * ly)
-            { i: Int, j: Int ->
-                when {
-                    (j == waveYPos) -> waveRho
-                    else -> balancedRho
-                }
+    { lx: Int, ly: Int, waveYPos: Int, waveRho: Double ->
+        val balancedRho = 1.0 - (lx * (waveRho - 1.0)) / (lx * ly)
+        { i: Int, j: Int ->
+            when {
+                (j == waveYPos) -> waveRho
+                else -> balancedRho
             }
         }
+    }
 
 val diagonalVelocity = { i: Int, j: Int ->
-    if ((i <= 7 && i >= 4) && (j <= 7 && j >= 4)) {
+    if ((i in 4..7) && (j in 4..7)) {
         doubleArrayOf(0.5, -0.5)
     } else {
         doubleArrayOf(0.0, 0.0)

@@ -38,9 +38,9 @@ fun main(args: Array<String>) {
     println("Max velocity norm: ${lattice.maxVelocityNorm()}")
 
     val printLine = { x: Any -> if (cli.verbose) println(x) }
-    val visualize = com.alekseyzhelo.lbm.gui.simple.util.setupVisualizer(cli, lattice)
+    val visualize = setupVisualizer(cli, lattice)
 
-    com.alekseyzhelo.lbm.gui.simple.util.initGraphicsWindow(cli)
+    initGraphicsWindow(cli)
 
     visualize()
     printLine("Total density: ${lattice.totalDensity()}")

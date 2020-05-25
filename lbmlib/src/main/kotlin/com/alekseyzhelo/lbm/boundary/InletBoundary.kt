@@ -6,9 +6,11 @@ import com.alekseyzhelo.lbm.util.computeEquilibrium
 import com.alekseyzhelo.lbm.util.normSquare
 import com.alekseyzhelo.lbm.util.opposite
 
-class InletBoundary(position: BoundaryPosition, lattice: LatticeD2,
-                    x0: Int, x1: Int, y0: Int, y1: Int,
-                    val inletRho: Double, val inletVelocity: DoubleArray) : BoundaryCondition(position, lattice, x0, x1, y0, y1) {
+class InletBoundary(
+    position: BoundaryPosition, lattice: LatticeD2,
+    x0: Int, x1: Int, y0: Int, y1: Int,
+    val inletRho: Double, val inletVelocity: DoubleArray
+) : BoundaryCondition(position, lattice, x0, x1, y0, y1) {
 
     override fun getType(): BoundaryType {
         return BoundaryType.INLET
@@ -22,21 +24,19 @@ class InletBoundary(position: BoundaryPosition, lattice: LatticeD2,
     }
 
     override fun boundaryStream() {
-//        var avgDensity = 0.0
         for (i in x0..x1) {
             for (j in y0..y1) {
                 for (f in position.inside) {
-                    lattice.cells[i + DescriptorD2Q9.c[f][0]][j + DescriptorD2Q9.c[f][1]].fBuf[f] = lattice.cells[i][j].f[f]
+                    lattice.cells[i + DescriptorD2Q9.c[f][0]][j + DescriptorD2Q9.c[f][1]].fBuf[f] =
+                        lattice.cells[i][j].f[f]
                 }
                 val uSqr = normSquare(inletVelocity)
                 for (f in position.outgoing) {
-                //for (f in 0..8) { // TODO: like this or like above?
-                    lattice.cells[i][j].fBuf[opposite[f]] = computeEquilibrium(opposite[f], inletRho, inletVelocity, uSqr)
+                    lattice.cells[i][j].fBuf[opposite[f]] =
+                        computeEquilibrium(opposite[f], inletRho, inletVelocity, uSqr)
                 }
-//                avgDensity += lattice.cells[i][j].computeBufferRho() / (y1 - y0)
             }
         }
-//        println(avgDensity)
     }
 
     override fun defineBoundaryRhoU(rho: Double, U: DoubleArray) {

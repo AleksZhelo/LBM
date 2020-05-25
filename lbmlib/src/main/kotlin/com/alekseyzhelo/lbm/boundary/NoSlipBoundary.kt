@@ -4,8 +4,10 @@ import com.alekseyzhelo.lbm.core.lattice.DescriptorD2Q9
 import com.alekseyzhelo.lbm.core.lattice.LatticeD2
 import com.alekseyzhelo.lbm.util.opposite
 
-class NoSlipBoundary(position: BoundaryPosition, lattice: LatticeD2,
-                     x0: Int, x1: Int, y0: Int, y1: Int) : BoundaryCondition(position, lattice, x0, x1, y0, y1) {
+class NoSlipBoundary(
+    position: BoundaryPosition, lattice: LatticeD2,
+    x0: Int, x1: Int, y0: Int, y1: Int
+) : BoundaryCondition(position, lattice, x0, x1, y0, y1) {
 
     override fun getType(): BoundaryType {
         return BoundaryType.NO_SLIP
@@ -21,7 +23,8 @@ class NoSlipBoundary(position: BoundaryPosition, lattice: LatticeD2,
         for (i in x0..x1) {
             for (j in y0..y1) {
                 for (f in position.inside) {
-                    lattice.cells[i + DescriptorD2Q9.c[f][0]][j + DescriptorD2Q9.c[f][1]].fBuf[f] = lattice.cells[i][j].f[f]
+                    lattice.cells[i + DescriptorD2Q9.c[f][0]][j + DescriptorD2Q9.c[f][1]].fBuf[f] =
+                        lattice.cells[i][j].f[f]
                 }
                 for (f in position.outgoing) {
                     lattice.cells[i][j].fBuf[opposite[f]] = lattice.cells[i][j].f[f]

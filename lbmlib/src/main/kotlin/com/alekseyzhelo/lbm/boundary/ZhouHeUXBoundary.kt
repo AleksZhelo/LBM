@@ -3,9 +3,11 @@ package com.alekseyzhelo.lbm.boundary
 import com.alekseyzhelo.lbm.core.lattice.LatticeD2
 
 // TODO: does not work
-class ZhouHeUXBoundary(position: BoundaryPosition, lattice: LatticeD2,
-                       x0: Int, x1: Int, y0: Int, y1: Int,
-                       val wallVelocity: DoubleArray) : BoundaryCondition(position, lattice, x0, x1, y0, y1) {
+class ZhouHeUXBoundary(
+    position: BoundaryPosition, lattice: LatticeD2,
+    x0: Int, x1: Int, y0: Int, y1: Int,
+    val wallVelocity: DoubleArray
+) : BoundaryCondition(position, lattice, x0, x1, y0, y1) {
 
     override fun getType(): BoundaryType {
         return BoundaryType.ZHOU_HE_UX
@@ -18,8 +20,10 @@ class ZhouHeUXBoundary(position: BoundaryPosition, lattice: LatticeD2,
                         +2.0 * (lattice.cells[i][j].f[4] + lattice.cells[i][j].f[7] + lattice.cells[i][j].f[8])
 
                 lattice.cells[i][j].fBuf[2] = lattice.cells[i][j].f[4]
-                lattice.cells[i][j].fBuf[5] = lattice.cells[i][j].f[7] - 0.5 * (lattice.cells[i][j].f[1] - lattice.cells[i][j].f[3]) + 0.5 * rho * wallVelocity[0]
-                lattice.cells[i][j].fBuf[6] = lattice.cells[i][j].f[8] + 0.5 * (lattice.cells[i][j].f[1] - lattice.cells[i][j].f[3]) - 0.5 * rho * wallVelocity[0]
+                lattice.cells[i][j].fBuf[5] =
+                    lattice.cells[i][j].f[7] - 0.5 * (lattice.cells[i][j].f[1] - lattice.cells[i][j].f[3]) + 0.5 * rho * wallVelocity[0]
+                lattice.cells[i][j].fBuf[6] =
+                    lattice.cells[i][j].f[8] + 0.5 * (lattice.cells[i][j].f[1] - lattice.cells[i][j].f[3]) - 0.5 * rho * wallVelocity[0]
             }
             else -> {
                 throw UnsupportedOperationException("not implemented yet")
@@ -77,8 +81,10 @@ class ZhouHeUXBoundary(position: BoundaryPosition, lattice: LatticeD2,
                         lattice.cells[iSub][jPlus].fBuf[6] = lattice.cells[i][j].f[6]
 
                         lattice.cells[i][j].fBuf[2] = lattice.cells[i][j].f[4]
-                        lattice.cells[i][j].fBuf[5] = lattice.cells[i][j].f[7] - 0.5 * (lattice.cells[i][j].f[1] - lattice.cells[i][j].f[3]) + 0.5 * rho * wallVelocity[0]
-                        lattice.cells[i][j].fBuf[6] = lattice.cells[i][j].f[8] + 0.5 * (lattice.cells[i][j].f[1] - lattice.cells[i][j].f[3]) - 0.5 * rho * wallVelocity[0]
+                        lattice.cells[i][j].fBuf[5] =
+                            lattice.cells[i][j].f[7] - 0.5 * (lattice.cells[i][j].f[1] - lattice.cells[i][j].f[3]) + 0.5 * rho * wallVelocity[0]
+                        lattice.cells[i][j].fBuf[6] =
+                            lattice.cells[i][j].f[8] + 0.5 * (lattice.cells[i][j].f[1] - lattice.cells[i][j].f[3]) - 0.5 * rho * wallVelocity[0]
                     }
                 }
             }

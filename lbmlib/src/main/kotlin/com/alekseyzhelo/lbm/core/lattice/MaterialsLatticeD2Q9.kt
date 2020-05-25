@@ -1,7 +1,6 @@
 package com.alekseyzhelo.lbm.core.lattice
 
 import com.alekseyzhelo.lbm.boundary.BoundaryCondition
-import com.alekseyzhelo.lbm.boundary.BoundaryType
 import com.alekseyzhelo.lbm.boundary.descriptor.BoundaryDescriptor
 import com.alekseyzhelo.lbm.core.cell.CellD2Q9
 import com.alekseyzhelo.lbm.core.cell.Material
@@ -16,8 +15,8 @@ import java.awt.image.BufferedImage
 /**
  * @author Aleks on 17-05-2016.
  */
-class MaterialsLatticeD2Q9(val imageSource: BufferedImage, omega: Double, dynamics: Dynamics2DQ9)
-: LatticeD2(imageSource.width, imageSource.height, emptyList<BoundaryDescriptor>(), dynamics, imageSource) {
+class MaterialsLatticeD2Q9(val imageSource: BufferedImage, omega: Double, dynamics: Dynamics2DQ9) :
+    LatticeD2(imageSource.width, imageSource.height, emptyList<BoundaryDescriptor>(), dynamics, imageSource) {
 
     init {
 
@@ -28,23 +27,22 @@ class MaterialsLatticeD2Q9(val imageSource: BufferedImage, omega: Double, dynami
     }
 
     override fun initCells(dynamics: Dynamics2DQ9): Array<Array<CellD2Q9>> {
-        return Array(LX, { x ->
-            Array(LY, {
-                y ->
+        return Array(LX) { x ->
+            Array(LY) { y ->
                 createCell(dynamics, x, y)
-            })
-        })
+            }
+        }
     }
 
     private fun createCell(dynamics: Dynamics2DQ9, x: Int, y: Int): CellD2Q9 {
-        return when(hack!!.getRGB(x, y)) {
+        return when (hack!!.getRGB(x, y)) {
             Material.FLOW.color -> MaterialCellD2Q9(Material.FLOW, dynamics)
             Material.INFLOW.color -> MaterialCellD2Q9(Material.INFLOW, NoDynamics)
             Material.OUTFLOW.color -> MaterialCellD2Q9(Material.OUTFLOW, NoDynamics)
             Material.NOTHING.color -> MaterialCellD2Q9(Material.NOTHING, VoidDynamics)
             Material.SOLID.color -> MaterialCellD2Q9(Material.SOLID, VoidDynamics)
             else -> {
-                println("Material ${hack.getRGB(x,y)} not supported.")
+                println("Material ${hack.getRGB(x, y)} not supported.")
                 MaterialCellD2Q9(Material.NOTHING, VoidDynamics)
             }
         }
@@ -57,7 +55,7 @@ class MaterialsLatticeD2Q9(val imageSource: BufferedImage, omega: Double, dynami
     override fun innerStream(x0: Int, x1: Int, y0: Int, y1: Int): Unit {
         for (i in x0..x1) {
             for (j in y0..y1) {
-                if(streamable.contains((cells[i][j] as MaterialCellD2Q9).material)) {
+                if (streamable.contains((cells[i][j] as MaterialCellD2Q9).material)) {
                     doStream(i, i + 1, i - 1, j, j + 1, j - 1)
                 }
             }
@@ -70,7 +68,7 @@ class MaterialsLatticeD2Q9(val imageSource: BufferedImage, omega: Double, dynami
         cells[i][j].fBuf[0] = cells[i][j].f[0]
 
         @Suppress("NON_EXHAUSTIVE_WHEN")
-        when(cell.material) {
+        when (cell.material) {
             Material.FLOW -> {
                 MaterialUtil.streamFlow(cell, cells[iPlus][j] as MaterialCellD2Q9, 1)
                 MaterialUtil.streamFlow(cell, cells[i][jPlus] as MaterialCellD2Q9, 2)

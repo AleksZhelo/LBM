@@ -21,7 +21,7 @@ import com.alekseyzhelo.lbm.util.timing.printExecutionTime
 fun main(args: Array<String>) {
     val cli = CLISettings()
     val cm = CMSettings()
-    collectArguments("LWJGL_LBM.jar", arrayOf(cli, cm), args)
+    collectArguments("LWJGL_APP.jar", arrayOf(cli, cm), args)
 
     val inletUX = 0.50
     val density = 1.0
@@ -30,25 +30,27 @@ fun main(args: Array<String>) {
     cli.lx = image.width
     cli.ly = image.height
     val lattice = MaterialsLatticeD2Q9(
-            image,
-            cli.omega,
-            BGKDynamicsD2Q9(cli.omega)
+        image,
+        cli.omega,
+        BGKDynamicsD2Q9(cli.omega)
     )
     lattice.iniEquilibrium(density, doubleArrayOf(0.0, 0.0))
     //lattice.iniEquilibrium(density, doubleArrayOf(inletUX, 0.0))
 
-    LatticeStatistics.init(lattice)
-    MaterialUtil.configure(density, doubleArrayOf(inletUX, 0.0))
+    LatticeStatistics.initVerbose(lattice)
+    if (cli.noRescale) {
+        LatticeStatistics.configure(false, false)
+    } else {
+        LatticeStatistics.configure(!cli.drawVelocities, cli.drawVelocities)
+    }
 
-    println("Min density: ${LatticeStatistics.minDensity}")
-    println("Max density: ${LatticeStatistics.maxDensity}")
-    println("Max velocity norm: ${LatticeStatistics.maxVelocity}")
+    MaterialUtil.configure(density, doubleArrayOf(inletUX, 0.0))
 
     val printLine = { x: Any -> if (cli.verbose) println(x) }
     val renderer = GL30Renderer(cli, cm, lattice, 800, 600)
     renderer.initialize()
 
-    renderer.frame(lattice.cells)
+//    renderer.frame(lattice.cells)
     printLine("Total density: ${lattice.totalDensity()}")
 
     if (cli.stop) readLine()
@@ -62,6 +64,7 @@ fun main(args: Array<String>) {
             lattice.swapCellBuffers()
         else
             lattice.bulkCollideParallel(0, cli.lx - 1, 0, cli.ly - 1)
+
         //if(time > 20000) {
         renderer.frame(lattice.cells)
         LatticeStatistics.reset()
@@ -70,7 +73,7 @@ fun main(args: Array<String>) {
             printLine("time: $time, max velocity: ${lattice.maxVelocityNorm()}")
             printLine("Total density: ${lattice.totalDensity()}")
         }
-        if(time % 1000 == 0) {
+        if (time % 1000 == 0) {
             val field = sampleVectorField(lattice)
             field.toDoubleArrFile("proper_oscillator_${time}_${cli.omega}_${inletUX}.txt")
             // break

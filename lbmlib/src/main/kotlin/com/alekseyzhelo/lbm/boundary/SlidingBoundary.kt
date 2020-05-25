@@ -2,16 +2,18 @@ package com.alekseyzhelo.lbm.boundary
 
 import com.alekseyzhelo.lbm.core.lattice.LatticeD2
 
-class SlidingBoundary(position: BoundaryPosition, lattice: LatticeD2,
-                      x0: Int, x1: Int, y0: Int, y1: Int,
-                      val slideVelocity: DoubleArray) : BoundaryCondition(position, lattice, x0, x1, y0, y1) {
+class SlidingBoundary(
+    position: BoundaryPosition, lattice: LatticeD2,
+    x0: Int, x1: Int, y0: Int, y1: Int,
+    val slideVelocity: DoubleArray
+) : BoundaryCondition(position, lattice, x0, x1, y0, y1) {
 
     override fun getType(): BoundaryType {
         return BoundaryType.SLIDING
     }
 
     override fun streamOutgoing(i: Int, j: Int) {
-        val coordVel = when(position) {
+        val coordVel = when (position) {
             BoundaryPosition.LEFT -> slideVelocity[1]
             BoundaryPosition.TOP -> slideVelocity[1]
             BoundaryPosition.RIGHT -> slideVelocity[1]
@@ -31,7 +33,9 @@ class SlidingBoundary(position: BoundaryPosition, lattice: LatticeD2,
                 lattice.cells[i][j].fBuf[5] = p * lattice.cells[i][j].f[7] + q * lattice.cells[i][j].f[8]
                 lattice.cells[i][j].fBuf[6] = q * lattice.cells[i][j].f[7] + p * lattice.cells[i][j].f[8]
             }
-            else -> { throw UnsupportedOperationException("not implemented yet")}
+            else -> {
+                throw UnsupportedOperationException("not implemented yet")
+            }
         }
     }
 
@@ -69,7 +73,8 @@ class SlidingBoundary(position: BoundaryPosition, lattice: LatticeD2,
                     for (j in y0..y1) {
                         val jPlus = j + 1
 
-                        val q = slideVelocity[0] / (2.0 * lattice.cells[i][j].computeRhoU()[0]) // TODO: correct as approximation to rho_w * u_w / (2.0 * f_8 - f_7)?
+                        val q =
+                            slideVelocity[0] / (2.0 * lattice.cells[i][j].computeRhoU()[0]) // TODO: correct as approximation to rho_w * u_w / (2.0 * f_8 - f_7)?
                         val p = 1.0 - q
 
                         lattice.cells[i][j].fBuf[0] = lattice.cells[i][j].f[0]

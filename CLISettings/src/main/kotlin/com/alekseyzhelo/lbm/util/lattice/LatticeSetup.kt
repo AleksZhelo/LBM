@@ -8,6 +8,7 @@ import com.alekseyzhelo.lbm.cli.CLISettings
 import com.alekseyzhelo.lbm.core.lattice.LatticeD2Q9
 import com.alekseyzhelo.lbm.dynamics.BGKDynamicsD2Q9
 import com.alekseyzhelo.lbm.dynamics.Dynamics2DQ9
+import com.alekseyzhelo.lbm.statistics.LatticeStatistics
 import java.util.*
 
 /**
@@ -48,6 +49,12 @@ fun setupLattice(cli: CLISettings, dynamics: Dynamics2DQ9, boundaries: Map<Bound
     val listBoundaries = convertLegacyBoundaries(boundaries, cli)
     val lattice = LatticeD2Q9(cli.lx, cli.ly, cli.omega, dynamics, listBoundaries)
     print(lattice)
+
+    if (cli.noRescale) {
+        LatticeStatistics.configure(false, false)
+    } else {
+        LatticeStatistics.configure(!cli.drawVelocities, cli.drawVelocities)
+    }
 
     return lattice
 }

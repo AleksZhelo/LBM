@@ -9,12 +9,12 @@ import com.alekseyzhelo.lbm.boundary.BoundaryType
 
 // TODO: necessary at all now with the new boundary creation logic?
 data class BoundaryDescriptor(
-        val position: BoundaryPosition,
-        val type: BoundaryType,
-        val doubleParam: Double?,
-        val doubleArrayParam: DoubleArray?,
-        val x0: Int,
-        val x1: Int,
-        val y0: Int,
-        val y1: Int
+    val position: BoundaryPosition,
+    val type: BoundaryType,
+    val doubleParam: Double?,
+    val doubleArrayParam: DoubleArray?,
+    val x0: Int,
+    val x1: Int,
+    val y0: Int,
+    val y1: Int
 )
