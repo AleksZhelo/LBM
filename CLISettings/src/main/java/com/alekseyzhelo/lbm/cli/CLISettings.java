@@ -7,9 +7,6 @@ import com.beust.jcommander.Parameter;
  */
 public class CLISettings {
 
-    //@Parameter(description = "timetable file")
-    //private List<String> files = new ArrayList<String>();
-
     @Parameter(names = {"--time", "-t"}, description = "Simulation time steps", required = true)
     private Integer time = null;
 
