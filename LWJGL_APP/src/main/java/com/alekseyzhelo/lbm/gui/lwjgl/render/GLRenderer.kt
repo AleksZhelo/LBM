@@ -2,7 +2,6 @@ package com.alekseyzhelo.lbm.gui.lwjgl.render
 
 import com.alekseyzhelo.lbm.cli.CLISettings
 import com.alekseyzhelo.lbm.core.cell.CellD2Q9
-import com.alekseyzhelo.lbm.core.lattice.LatticeD2
 import com.alekseyzhelo.lbm.gui.lwjgl.cli.CMSettings
 import com.alekseyzhelo.lbm.gui.lwjgl.color.colormap.*
 import com.alekseyzhelo.lbm.statistics.LatticeStatistics
@@ -18,12 +17,11 @@ import org.lwjgl.system.MemoryUtil
 /**
  * @author Aleks on 03-07-2016.
  */
-abstract class GLRenderer(
-        val cli: CLISettings,
-        val cm: CMSettings,
-        lattice: LatticeD2,
-        val WIDTH: Int = 750,
-        val HEIGHT: Int = 750
+abstract class GLRenderer<Cell : CellD2Q9>(
+    val cli: CLISettings,
+    val cm: CMSettings,
+    val WIDTH: Int = 750,
+    val HEIGHT: Int = 750
 ) {
 
     // The window handle
@@ -52,7 +50,7 @@ abstract class GLRenderer(
         }
     }
 
-    val frame: (cells: Array<Array<CellD2Q9>>) -> Unit = if (cli.headless) { x -> Unit } else { x -> doFrame(x) }
+    val frame: (cells: Array<Array<Cell>>) -> Unit = if (cli.headless) { x -> Unit } else { x -> doFrame(x) }
 
     fun initialize() {
         if (cli.headless) {
@@ -137,7 +135,7 @@ abstract class GLRenderer(
 
     fun windowShouldClose() = if (cli.headless) false else glfwWindowShouldClose(window)
 
-    abstract protected fun doFrame(cells: Array<Array<CellD2Q9>>)
+    protected abstract fun doFrame(cells: Array<Array<Cell>>)
 
     private fun resolveColormap(): Colormap {
         // TODO: automatically list all implemented colormaps?

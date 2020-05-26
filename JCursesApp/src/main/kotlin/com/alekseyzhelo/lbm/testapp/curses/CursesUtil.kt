@@ -50,7 +50,7 @@ fun CellD2Q9.drawVelocityRatedValue(i: Int, j: Int,
 }
 
 // TODO: better names for these functions
-fun LatticeD2.drawPressureRatedTable(minPressure: Double, maxPressure: Double,
+fun LatticeD2<*>.drawPressureRatedTable(minPressure: Double, maxPressure: Double,
                                        func: (Rho: Double) -> String): Unit {
     val strLen = func(-0.001).length
     for (j in cells[0].size - 1 downTo 0) {
@@ -61,7 +61,7 @@ fun LatticeD2.drawPressureRatedTable(minPressure: Double, maxPressure: Double,
 }
 
 // TODO: better names for these functions
-fun LatticeD2.drawVelocityRatedTable(minUNorm: Double, maxUNorm: Double,
+fun LatticeD2<*>.drawVelocityRatedTable(minUNorm: Double, maxUNorm: Double,
                                        func: (U: DoubleArray) -> String): Unit {
     val strLen = func(doubleArrayOf(1.0, -1.0)).length
     for (j in cells[0].size - 1 downTo 0) {

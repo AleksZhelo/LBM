@@ -43,7 +43,6 @@
             <groupId>org.lwjgl</groupId>
             <artifactId>lwjgl-platform</artifactId>
             <version>${lwjgl.version}</version>
-            <!-- TODO: add other natives as well -->
             <classifier>natives-windows</classifier>
         </dependency>
         <dependency>

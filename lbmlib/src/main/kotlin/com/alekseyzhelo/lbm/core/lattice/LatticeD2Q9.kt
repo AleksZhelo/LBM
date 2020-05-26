@@ -14,9 +14,11 @@ import com.alekseyzhelo.lbm.dynamics.NoDynamics
 // TODO: some kind of statistics, output, etc
 // TODO: units
 class LatticeD2Q9(
-    LX: Int, LY: Int, omega: Double, dynamics: Dynamics2DQ9,
+    LX: Int,
+    LY: Int,
+    dynamics: Dynamics2DQ9,
     boundaries: List<BoundaryDescriptor>
-) : LatticeD2(LX, LY, boundaries, dynamics) {
+) : LatticeD2<CellD2Q9>(LX, LY, boundaries, dynamics) {
 
     private val leftBoundary = findBoundary(BoundaryPosition.LEFT)
     private val topBoundary = findBoundary(BoundaryPosition.TOP)
@@ -54,7 +56,6 @@ class LatticeD2Q9(
             }
         }
 
-        // TODO: improve error message
         throw IllegalStateException("Regular lattice should have all boundaries specified.")
     }
 

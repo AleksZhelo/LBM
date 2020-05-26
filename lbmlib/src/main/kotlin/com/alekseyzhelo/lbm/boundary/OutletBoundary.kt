@@ -5,7 +5,7 @@ import com.alekseyzhelo.lbm.core.lattice.LatticeD2
 import com.alekseyzhelo.lbm.util.opposite
 
 class OutletBoundary(
-    position: BoundaryPosition, lattice: LatticeD2,
+    position: BoundaryPosition, lattice: LatticeD2<*>,
     x0: Int, x1: Int, y0: Int, y1: Int,
     val inletVelocity: Double
 ) : BoundaryCondition(position, lattice, x0, x1, y0, y1) {

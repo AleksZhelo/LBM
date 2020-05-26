@@ -12,20 +12,13 @@ import java.util.stream.IntStream
  * @author Aleks on 16-07-2016.
  */
 
-// TODO: how do I remove this hack?
-abstract class LatticeD2(
+abstract class LatticeD2<T : CellD2Q9>(
     val LX: Int, val LY: Int,
-    boundaries: List<BoundaryDescriptor>, dynamics: Dynamics2DQ9,
-    val hack: BufferedImage? = null
+    boundaries: List<BoundaryDescriptor>, dynamics: Dynamics2DQ9
 ) {
     // TODO: SOFT-BLOCKER figure out proper dynamics on boundaries
-    val cells: Array<Array<CellD2Q9>>
-    val boundaries: Array<BoundaryCondition>
-
-    init {
-        this.boundaries = initBoundaries(boundaries)
-        cells = initCells(dynamics)
-    }
+    val cells: Array<Array<T>> by lazy { initCells(dynamics) }
+    val boundaries: Array<BoundaryCondition> by lazy { initBoundaries(boundaries) }
 
     protected open fun initBoundaries(boundaries: List<BoundaryDescriptor>): Array<BoundaryCondition> {
         return Array(boundaries.size) { i: Int ->
@@ -38,7 +31,7 @@ abstract class LatticeD2(
         }
     }
 
-    protected abstract fun initCells(dynamics: Dynamics2DQ9): Array<Array<CellD2Q9>>
+    protected abstract fun initCells(dynamics: Dynamics2DQ9): Array<Array<T>>
 
     // TODO: slow?
     protected fun boundaryContains(i: Int, j: Int): BoundaryCondition? {

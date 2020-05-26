@@ -3,13 +3,11 @@ package com.alekseyzhelo.lbm.gui.lwjgl.render
 import com.alekseyzhelo.lbm.cli.CLISettings
 import com.alekseyzhelo.lbm.core.cell.CellD2Q9
 import com.alekseyzhelo.lbm.core.lattice.LatticeD2
-import com.alekseyzhelo.lbm.core.lattice.LatticeD2Q9
 import com.alekseyzhelo.lbm.gui.lwjgl.cli.CMSettings
+import com.alekseyzhelo.lbm.gui.lwjgl.color.FloatColor
 import com.alekseyzhelo.lbm.gui.lwjgl.render.mesh.MutableColourMesh
 import com.alekseyzhelo.lbm.gui.lwjgl.render.shader.ShaderProgram
 import com.alekseyzhelo.lbm.gui.lwjgl.util.ResourcesUtil
-import com.alekseyzhelo.lbm.statistics.LatticeStatistics
-import com.alekseyzhelo.lbm.util.norm
 import com.alekseyzhelo.lbm.util.normalize
 import org.joml.Matrix4f
 import org.joml.Vector4f
@@ -24,13 +22,12 @@ import org.lwjgl.opengl.GL30.glBindVertexArray
  * @author Aleks on 27-06-2016.
  */
 
-class GL30Renderer(
+open class GL30Renderer<Cell : CellD2Q9>(
         cli: CLISettings,
         cm: CMSettings,
-        lattice: LatticeD2,
         WIDTH: Int = 750,
         HEIGHT: Int = 750
-) : GLRenderer(cli, cm, lattice, WIDTH, HEIGHT) {
+) : GLRenderer<Cell>(cli, cm, WIDTH, HEIGHT) {
 
     private var shaderProgram: ShaderProgram? = null
     private var mesh: MutableColourMesh? = null
@@ -128,7 +125,7 @@ class GL30Renderer(
         mesh = MutableColourMesh(vertices, colours, indices)
     }
 
-    override fun doFrame(cells: Array<Array<CellD2Q9>>) {
+    override fun doFrame(cells: Array<Array<Cell>>) {
         /* Get width and height to calculate the ratio */
         glfwGetFramebufferSize(window, width, height)
 
@@ -139,9 +136,8 @@ class GL30Renderer(
         mesh?.updateColourBuffer {
             colors ->
             for (i in cells.indices) {
-                for (j in cells[0].indices) {
-                    val value = cellValue(cells[i][j])
-                    val color = colormap.getColor(normalize(value, minValue(), maxValue()).toFloat())
+                for (j in cells[0].indices.reversed()) {
+                    val color = cellColor(cells[i][j])
 
                     colors.put(color.r)
                     colors.put(color.g)
@@ -182,6 +178,14 @@ class GL30Renderer(
         /* Flip buffers for next loop */
         width.flip()
         height.flip()
+    }
+
+    protected open fun cellColor(
+        cell: Cell
+    ): FloatColor {
+        val value = cellValue(cell)
+        val color = colormap.getColor(normalize(value, minValue(), maxValue()).toFloat())
+        return color
     }
 
 }

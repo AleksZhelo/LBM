@@ -55,7 +55,7 @@ class MutableColourMesh(posBuffer: FloatBuffer, colourBuffer: FloatBuffer, indic
         glBindVertexArray(0)
     }
 
-    inline fun updateColourBuffer(update: (buf: FloatBuffer) -> Unit) { // TODO: correct use of inline?
+    inline fun updateColourBuffer(update: (buf: FloatBuffer) -> Unit) {
         glBindBuffer(GL_ARRAY_BUFFER, colourVboId)
         val mappedBuffer = glMapBufferRange(
                 GL_ARRAY_BUFFER, 0, colourCount.toLong(),

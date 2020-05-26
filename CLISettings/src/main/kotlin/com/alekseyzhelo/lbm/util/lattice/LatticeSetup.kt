@@ -47,7 +47,7 @@ fun setupLattice(cli: CLISettings, boundaries: Map<BoundaryPosition, Pair<Bounda
 
 fun setupLattice(cli: CLISettings, dynamics: Dynamics2DQ9, boundaries: Map<BoundaryPosition, Pair<BoundaryType, Pair<Double, DoubleArray>?>>): LatticeD2Q9 {
     val listBoundaries = convertLegacyBoundaries(boundaries, cli)
-    val lattice = LatticeD2Q9(cli.lx, cli.ly, cli.omega, dynamics, listBoundaries)
+    val lattice = LatticeD2Q9(cli.lx, cli.ly, dynamics, listBoundaries)
     print(lattice)
 
     if (cli.noRescale) {

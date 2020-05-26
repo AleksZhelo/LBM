@@ -29,7 +29,7 @@ enum class BoundaryType {
 }
 
 abstract class BoundaryCondition(
-    val position: BoundaryPosition, protected val lattice: LatticeD2,
+    val position: BoundaryPosition, protected val lattice: LatticeD2<*>,
     val x0: Int, val x1: Int, val y0: Int, val y1: Int
 ) {
 

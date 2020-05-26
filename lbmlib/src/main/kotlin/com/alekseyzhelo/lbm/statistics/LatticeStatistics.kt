@@ -20,13 +20,13 @@ object LatticeStatistics {
     private var gatherDensity = false
     private var gatherVelocity = false
 
-    fun init(lattice: LatticeD2) {
+    fun init(lattice: LatticeD2<*>) {
         maxVelocity = lattice.maxVelocityNorm()
         minDensity = lattice.minDensity()
         maxDensity = lattice.maxDensity()
     }
 
-    fun initVerbose(lattice: LatticeD2) {
+    fun initVerbose(lattice: LatticeD2<*>) {
         init(lattice)
 
         println("Min density: $minDensity")

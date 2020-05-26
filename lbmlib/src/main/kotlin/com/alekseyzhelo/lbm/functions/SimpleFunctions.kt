@@ -4,9 +4,6 @@ package com.alekseyzhelo.lbm.functions
  * @author Aleks on 29-05-2016.
  */
 
-// TODO: or functors?
-// TODO: should I turn these into usual functions? What is the difference between declaring them like this
-// TODO: and the usual way?
 val pressureWaveRho: (lx: Int, ly: Int, waveCenterRho: Double) -> (i: Int, j: Int) -> Double =
     { lx, ly, waveCenterRho ->
         val balancedRho = 1.0 - (waveCenterRho - 1.0) / (lx * ly)

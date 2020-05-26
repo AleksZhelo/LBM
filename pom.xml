@@ -26,7 +26,7 @@
         <module>CLISettings</module>
         <module>LWJGL_APP</module>
         <module>SimpleGUIApp</module>
-        <module>TestApp</module>
+        <module>JCursesApp</module>
     </modules>
 
     <dependencies>

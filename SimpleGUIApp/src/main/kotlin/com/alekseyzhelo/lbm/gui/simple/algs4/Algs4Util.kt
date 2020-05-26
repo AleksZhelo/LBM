@@ -12,7 +12,6 @@ import java.util.*
 
 internal val colorMemo = HashMap<Int, Color>()
 
-// TODO: need blue-white-red nonlinear(?) gradient here! Consult Jan's video.
 internal fun blueRedGradient(n: Int): Color {
     val corrected = when {
         n > 255 -> 255
@@ -56,8 +55,7 @@ internal fun drawVectorValue(value: DoubleArray, i: Int, j: Int,
     FasterStdDraw.drawArrowLineTest((i).toDouble(), (j).toDouble(), i + ort[0], j + ort[1], 0.3, 0.2)
 }
 
-// TODO: how bad is this from an object-oriented design perspective?
-fun LatticeD2.drawDensityTable(minDensity: Double, maxDensity: Double): Unit {
+fun LatticeD2<*>.drawDensityTable(minDensity: Double, maxDensity: Double): Unit {
     for (i in cells.indices) {
         for (j in cells[0].indices) {
             drawScalarValue(cells[i][j].computeRho(), i, j, minDensity, maxDensity)
@@ -65,7 +63,7 @@ fun LatticeD2.drawDensityTable(minDensity: Double, maxDensity: Double): Unit {
     }
 }
 
-fun LatticeD2.drawVelocityNormTable(minVelocityNorm: Double, maxVelocityNorm: Double): Unit {
+fun LatticeD2<*>.drawVelocityNormTable(minVelocityNorm: Double, maxVelocityNorm: Double): Unit {
     for (i in cells.indices) {
         for (j in cells[0].indices) {
             drawScalarValue(
@@ -76,7 +74,7 @@ fun LatticeD2.drawVelocityNormTable(minVelocityNorm: Double, maxVelocityNorm: Do
     }
 }
 
-fun LatticeD2.drawVelocityVectorTable(minVelocityNorm: Double, maxVelocityNorm: Double): Unit {
+fun LatticeD2<*>.drawVelocityVectorTable(minVelocityNorm: Double, maxVelocityNorm: Double): Unit {
     for (i in cells.indices) {
         for (j in cells[0].indices) {
             drawVectorValue(

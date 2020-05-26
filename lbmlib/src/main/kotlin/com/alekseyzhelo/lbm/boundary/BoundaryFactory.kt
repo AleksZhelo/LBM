@@ -9,7 +9,7 @@ import com.alekseyzhelo.lbm.core.lattice.LatticeD2
 object D2BoundaryFactory {
 
     fun create(
-        position: BoundaryPosition, type: BoundaryType, lattice: LatticeD2,
+        position: BoundaryPosition, type: BoundaryType, lattice: LatticeD2<*>,
         x0: Int, x1: Int, y0: Int, y1: Int,
         doubleParam: Double? = null, doubleArrayParam: DoubleArray? = null
     ): BoundaryCondition {

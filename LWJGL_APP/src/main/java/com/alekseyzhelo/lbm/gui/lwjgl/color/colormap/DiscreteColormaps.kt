@@ -29,9 +29,6 @@ object CoolwarmDiscreteColormap : Colormap {
     }
 
     override fun getColor(normalized: Float): FloatColor {
-        if (checkIsNan && normalized.isNaN()) {
-            return FloatColor(0.0f, 0.0f, 0.0f)
-        }
         val index = (normalized * range).toInt()
         return FloatColor(r[index], g[index], b[index])
     }

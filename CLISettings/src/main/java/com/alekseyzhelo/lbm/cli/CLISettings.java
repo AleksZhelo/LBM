@@ -10,11 +10,11 @@ public class CLISettings {
     @Parameter(names = {"--time", "-t"}, description = "Simulation time steps", required = true)
     private Integer time = null;
 
-    @Parameter(names = {"--length-x", "-lx"}, description = "Simulation rectangle X size (nodes).", required = true)
-    private Integer lx = null;
+    @Parameter(names = {"--length-x", "-lx"}, description = "Simulation rectangle X size (nodes).", required = false)
+    private Integer lx = 256;
 
-    @Parameter(names = {"--length-y", "-ly"}, description = "Simulation rectangle Y size (nodes).", required = true)
-    private Integer ly = null;
+    @Parameter(names = {"--length-y", "-ly"}, description = "Simulation rectangle Y size (nodes).", required = false)
+    private Integer ly = 256;
 
     @Parameter(names = {"--omega", "-o"}, description = "Reciprocal value of the relaxation parameter (1/tau).", required = true)
     private Double omega = null;

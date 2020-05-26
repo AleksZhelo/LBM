@@ -38,8 +38,8 @@ fun setupVisualizer(cli: CLISettings, lattice: LatticeD2Q9, delay: Int = 25): ()
                 FasterStdDraw.show(delay);
             }
         }
-        true -> { -> { -> } }
-    }()  // TODO: so is this stupid or what?
+        true -> { -> { } }
+    }()
 }
 
 fun initGraphicsWindow(cli: CLISettings, width: Int = 750, height: Int = 750) {

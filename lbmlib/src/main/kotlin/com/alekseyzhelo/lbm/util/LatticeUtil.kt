@@ -5,7 +5,7 @@ import com.alekseyzhelo.lbm.core.lattice.LatticeD2
 /**
  * @author Aleks on 29-05-2016.
  */
-fun LatticeD2.minDensity(): Double { // TODO can be called without a lattice? WTF?
+fun LatticeD2<*>.minDensity(): Double {
     var min = Double.MAX_VALUE
     for (i in cells.indices) {
         for (j in cells[i].indices) {
@@ -17,7 +17,7 @@ fun LatticeD2.minDensity(): Double { // TODO can be called without a lattice? WT
     return min
 }
 
-fun LatticeD2.maxDensity(): Double { // TODO can be called without a lattice? WTF?
+fun LatticeD2<*>.maxDensity(): Double {
     var max = 0.0
     for (i in cells.indices) {
         for (j in cells[i].indices) {
@@ -29,7 +29,7 @@ fun LatticeD2.maxDensity(): Double { // TODO can be called without a lattice? WT
     return max
 }
 
-fun LatticeD2.minVelocityNorm(): Double { // TODO can be called without a lattice? WTF?
+fun LatticeD2<*>.minVelocityNorm(): Double {
     var min = Double.MAX_VALUE
     for (i in cells.indices) {
         for (j in cells[i].indices) {
@@ -41,7 +41,7 @@ fun LatticeD2.minVelocityNorm(): Double { // TODO can be called without a lattic
     return min
 }
 
-fun LatticeD2.maxVelocityNorm(): Double { // TODO can be called without a lattice? WTF?
+fun LatticeD2<*>.maxVelocityNorm(): Double {
     var max = 0.0
     for (i in cells.indices) {
         for (j in cells[i].indices) {

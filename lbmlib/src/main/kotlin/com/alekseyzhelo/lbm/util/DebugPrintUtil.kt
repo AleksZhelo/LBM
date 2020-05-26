@@ -6,7 +6,7 @@ import com.alekseyzhelo.lbm.core.lattice.LatticeD2
 /**
  * @author Aleks on 29-05-2016.
  */
-fun LatticeD2.toDensityTable(mainF: Boolean): String {
+fun LatticeD2<*>.toDensityTable(mainF: Boolean): String {
     val computeRho = if (mainF)
         { x: CellD2Q9 -> x.computeRho() }
     else
@@ -22,7 +22,7 @@ fun LatticeD2.toDensityTable(mainF: Boolean): String {
     }.replace("0.0", "_._")
 }
 
-fun LatticeD2.toVelocityTable(mainF: Boolean): String {
+fun LatticeD2<*>.toVelocityTable(mainF: Boolean): String {
     val computeRho = if (mainF)
         { x: CellD2Q9 -> x.computeRho() }
     else

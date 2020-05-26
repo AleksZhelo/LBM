@@ -19,7 +19,6 @@ abstract class BGKDynamicsD2Q9_rho_c(val omega: Double) : Dynamics2DQ9 {
         return Rho * DescriptorD2Q9.w[i] * (1 + 3.0 * c_u + 4.5 * c_u * c_u - 1.5 * uSqr)
     }
 
-    // TODO field vs local var vs .. performance effect?
     val eqMult1 = 3.0
     val eqMult2 = 9.0 / 2.0
     val eqMult3 = 3.0 / 2.0

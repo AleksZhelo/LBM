@@ -10,5 +10,3 @@ interface Colormap {
     fun getColor(normalized: Float): FloatColor
     fun getName(): String
 }
-
-internal val checkIsNan = false // TODO: bad practice?

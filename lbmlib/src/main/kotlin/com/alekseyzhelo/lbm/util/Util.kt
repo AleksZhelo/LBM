@@ -7,8 +7,7 @@ import java.util.*
  * @author Aleks on 28-05-2016.
  */
 
-@Suppress("NOTHING_TO_INLINE") // TODO: investigate
-inline fun normalize(value: Double, minValue: Double, maxValue: Double): Double {
+fun normalize(value: Double, minValue: Double, maxValue: Double): Double {
     return (value - minValue) / (maxValue - minValue)
 }
 

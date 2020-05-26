@@ -3,6 +3,7 @@ package com.alekseyzhelo.lbm.gui.lwjgl
 import com.alekseyzhelo.lbm.boundary.BoundaryType
 import com.alekseyzhelo.lbm.cli.CLISettings
 import com.alekseyzhelo.lbm.cli.collectArguments
+import com.alekseyzhelo.lbm.core.cell.CellD2Q9
 import com.alekseyzhelo.lbm.functions.multiplePressureWaveRho
 import com.alekseyzhelo.lbm.functions.rowPressureWaveRho
 import com.alekseyzhelo.lbm.gui.lwjgl.cli.CMSettings
@@ -48,10 +49,10 @@ fun main(args: Array<String>) {
         cli,
         boundaries
     ) //, ConstantXForce_BGK_D2Q9(cli.omega, force), boundaries)
-//    lattice.iniEquilibrium(multiplePressureWaveRho(cli.lx, cli.ly, 4, 4, 4.5), doubleArrayOf(0.0, 0.0))
+    lattice.iniEquilibrium(multiplePressureWaveRho(cli.lx, cli.ly, 4, 4, 4.5), doubleArrayOf(0.0, 0.0))
 //    lattice.iniEquilibrium(squareEmptyRho(cli.lx, cli.ly, 4, 4, 0.1), doubleArrayOf(0.0, 0.0))
     //lattice.iniEquilibrium(columnPressureWaveRho(cli.lx, cli.ly, 10, 1.5), doubleArrayOf(0.0, 0.0))
-    lattice.iniEquilibrium(rowPressureWaveRho(cli.lx, cli.ly, 100, 1.05), doubleArrayOf(0.0, 0.0))
+//    lattice.iniEquilibrium(rowPressureWaveRho(cli.lx, cli.ly, 100, 1.05), doubleArrayOf(0.0, 0.0))
 //    lattice.iniEquilibrium(density, doubleArrayOf(0.0, 0.0))
 //    lattice.iniEquilibrium(density, doubleArrayOf(inletUX, 0.0))
 
@@ -62,7 +63,7 @@ fun main(args: Array<String>) {
     println("Max velocity norm: ${LatticeStatistics.maxVelocity}")
 
     val printLine = { x: Any -> if (cli.verbose) println(x) }
-    val renderer = GL30Renderer(cli, cm, lattice, 512, 512)
+    val renderer = GL30Renderer<CellD2Q9>(cli, cm, 512, 512)
     renderer.initialize()
 
     renderer.frame(lattice.cells)
@@ -99,13 +100,6 @@ fun main(args: Array<String>) {
 //            field.toDoubleArrFile("vectorField5000_works.txt")
 //            break
 //        }
-        //printLine("Min density: ${lattice.minDensity()}")
-        //printLine("Max density: ${lattice.maxDensity()}")
-        //printLine("Min velocity: ${lattice.minVelocityNorm()}")
-//        printLine("Max velocity: ${lattice.maxVelocityNorm().format(6)}")
-//        printLine("Total density: ${lattice.totalDensity()}")
-        //printLine("0,0 density: ${lattice.cells[0][0].computeRho()}")
-        //printLine("lx/2,ly/2 density: ${lattice.cells[cli.lx/2][cli.ly/2].computeRho()}")
     }
     time--
     val end = System.currentTimeMillis()

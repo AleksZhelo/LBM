@@ -7,7 +7,7 @@ import com.alekseyzhelo.lbm.util.normSquare
 import com.alekseyzhelo.lbm.util.opposite
 
 class InletBoundary(
-    position: BoundaryPosition, lattice: LatticeD2,
+    position: BoundaryPosition, lattice: LatticeD2<*>,
     x0: Int, x1: Int, y0: Int, y1: Int,
     val inletRho: Double, val inletVelocity: DoubleArray
 ) : BoundaryCondition(position, lattice, x0, x1, y0, y1) {

@@ -21,9 +21,6 @@ object CoolwarmRGBInterpolatedColormap: Colormap {
             else -> 1
         }
         val high = low + 1
-        if (checkIsNan && normalized.isNaN()) {
-            return FloatColor(0.0f, 0.0f, 0.0f)
-        }
         val p = (normalized - x[low]) / (x[high] - x[low])
         val oneMinP = 1.0f - p
         return FloatColor(oneMinP * r[low] + p * r[high], oneMinP * g[low] + p * g[high], oneMinP * b[low] + p * b[high])
@@ -51,9 +48,6 @@ object BluerJetColormap: Colormap {
             else -> 5
         }
         val high = low + 1
-        if (checkIsNan && normalized.isNaN()) {
-            return FloatColor(0.0f, 0.0f, 0.0f)
-        }
         val p = (normalized - x[low]) / (x[high] - x[low])
         val oneMinP = 1.0f - p
         return FloatColor(oneMinP * r[low] + p * r[high], oneMinP * g[low] + p * g[high], oneMinP * b[low] + p * b[high])
@@ -67,9 +61,6 @@ object BluerJetColormap: Colormap {
 
 object BlueRedColormap : Colormap {
     override fun getColor(normalized: Float): FloatColor {
-        if (checkIsNan && normalized.isNaN()) {
-            return FloatColor(0.0f, 0.0f, 0.0f)
-        }
         return FloatColor(normalized, 0.0f, 1.0f - normalized)
     }
 
