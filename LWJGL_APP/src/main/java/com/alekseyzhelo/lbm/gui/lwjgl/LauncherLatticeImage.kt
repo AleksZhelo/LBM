@@ -4,6 +4,7 @@ import com.alekseyzhelo.lbm.cli.LatticeFileSettings
 import com.alekseyzhelo.lbm.cli.collectArguments
 import com.alekseyzhelo.lbm.core.lattice.MaterialsLatticeD2Q9
 import com.alekseyzhelo.lbm.dynamics.BGKDynamicsD2Q9
+import com.alekseyzhelo.lbm.functions.columnPressureWaveRho
 import com.alekseyzhelo.lbm.gui.lwjgl.cli.CMSettings
 import com.alekseyzhelo.lbm.gui.lwjgl.render.GL30Renderer
 import com.alekseyzhelo.lbm.gui.lwjgl.render.MaterialGL30Renderer
@@ -35,6 +36,7 @@ fun main(args: Array<String>) {
         BGKDynamicsD2Q9(cli.omega)
     )
     lattice.iniEquilibrium(density, doubleArrayOf(0.0, 0.0))
+//    lattice.iniEquilibrium(columnPressureWaveRho(cli.lx, cli.ly, 400, 5.5), doubleArrayOf(0.0, 0.0))
 //    lattice.iniEquilibrium(density, doubleArrayOf(inletUX, 0.0))
 
     LatticeStatistics.initVerbose(lattice)

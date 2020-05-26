@@ -4,6 +4,7 @@ import com.alekseyzhelo.lbm.boundary.BoundaryType
 import com.alekseyzhelo.lbm.cli.CLISettings
 import com.alekseyzhelo.lbm.cli.collectArguments
 import com.alekseyzhelo.lbm.core.cell.CellD2Q9
+import com.alekseyzhelo.lbm.functions.columnPressureWaveRho
 import com.alekseyzhelo.lbm.functions.multiplePressureWaveRho
 import com.alekseyzhelo.lbm.functions.rowPressureWaveRho
 import com.alekseyzhelo.lbm.gui.lwjgl.cli.CMSettings
@@ -28,7 +29,7 @@ fun main(args: Array<String>) {
         BoundaryType.NO_SLIP, // top
         BoundaryType.NO_SLIP, // right
         BoundaryType.NO_SLIP, // bottom // ZHOU_HE_UX does not work :((((
-        tParam = Pair(-0.0, doubleArrayOf(0.50, 0.0)), //0.61, //0.01,
+        tParam = Pair(-0.0, doubleArrayOf(0.40, 0.0)), //0.61, //0.01,
         bParam = Pair(-0.0, doubleArrayOf(0.10, 0.0))
     )
 
@@ -49,18 +50,12 @@ fun main(args: Array<String>) {
         cli,
         boundaries
     ) //, ConstantXForce_BGK_D2Q9(cli.omega, force), boundaries)
-    lattice.iniEquilibrium(multiplePressureWaveRho(cli.lx, cli.ly, 4, 4, 4.5), doubleArrayOf(0.0, 0.0))
+//    lattice.iniEquilibrium(multiplePressureWaveRho(cli.lx, cli.ly, 4, 4, 4.5), doubleArrayOf(0.0, 0.0))
 //    lattice.iniEquilibrium(squareEmptyRho(cli.lx, cli.ly, 4, 4, 0.1), doubleArrayOf(0.0, 0.0))
-    //lattice.iniEquilibrium(columnPressureWaveRho(cli.lx, cli.ly, 10, 1.5), doubleArrayOf(0.0, 0.0))
+    lattice.iniEquilibrium(columnPressureWaveRho(cli.lx, cli.ly, 100, 10.5), doubleArrayOf(0.0, 0.0))
 //    lattice.iniEquilibrium(rowPressureWaveRho(cli.lx, cli.ly, 100, 1.05), doubleArrayOf(0.0, 0.0))
 //    lattice.iniEquilibrium(density, doubleArrayOf(0.0, 0.0))
 //    lattice.iniEquilibrium(density, doubleArrayOf(inletUX, 0.0))
-
-    LatticeStatistics.init(lattice)
-
-    println("Min density: ${LatticeStatistics.minDensity}")
-    println("Max density: ${LatticeStatistics.maxDensity}")
-    println("Max velocity norm: ${LatticeStatistics.maxVelocity}")
 
     val printLine = { x: Any -> if (cli.verbose) println(x) }
     val renderer = GL30Renderer<CellD2Q9>(cli, cm, 512, 512)
